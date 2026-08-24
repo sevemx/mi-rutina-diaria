@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#eef1f7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Mi Rutina Diaria</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="hero card">
+      <div class="hero-top">
+        <div><p class="eyebrow">Agenda personal</p><h1>Mi Rutina Diaria</h1></div>
+        <button id="resetBtn" class="button" type="button">↻ Reiniciar día</button>
+      </div>
+      <div class="date-row"><div><strong id="currentDate">—</strong><span id="currentDay">—</span></div><time id="clock">00:00:00</time></div>
+      <section class="progress card-inner">
+        <div class="progress-heading"><span>Avance del día</span><strong><span id="progressPercent">0</span>%</strong></div>
+        <div class="progress-bar"><div id="progressFill"></div></div>
+        <div class="summary-grid"><div><span>Completadas</span><strong><span id="completedCount">0</span> / <span id="totalCount">0</span></strong></div><div><span>Hora de dormir</span><strong>23:00</strong></div></div>
+      </section>
+    </header>
+    <section id="currentActivityCard" class="card highlight" hidden><p class="label">ACTIVIDAD ACTUAL</p><div class="highlight-row"><div><p id="currentActivityTime" class="muted">—</p><h2 id="currentActivityName">—</h2><span id="timeRemaining" class="badge">—</span></div><span id="currentActivityEmoji" class="big-emoji">⏳</span></div></section>
+    <section id="freeTimeCard" class="card highlight free" hidden><p class="label">TIEMPO LIBRE / TRANSICIÓN</p><div class="highlight-row"><div><h2>Tiempo libre / transición</h2><p class="muted">No hay una actividad programada en este momento.</p></div><span class="big-emoji">✨</span></div></section>
+    <section id="nextActivityCard" class="card next" hidden><p class="label">PRÓXIMA ACTIVIDAD</p><div class="next-row"><span id="nextActivityEmoji" class="big-emoji small">➡️</span><div><p id="nextActivityTime" class="muted">—</p><h3 id="nextActivityName">—</h3></div></div></section>
+    <section class="card info"><p class="label">RESUMEN DEL DÍA</p><ul><li><span>Actividades completadas</span><strong><span id="infoCompleted">0</span> / <span id="infoTotal">0</span></strong></li><li><span>Avance</span><strong><span id="infoProgress">0</span>%</strong></li><li><span>Próxima actividad</span><strong id="infoNext">—</strong></li><li><span>Hora de dormir</span><strong>23:00</strong></li></ul></section>
+    <section id="activitiesContainer" class="activities"></section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
