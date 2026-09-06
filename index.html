@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta name="theme-color" content="#eef1f7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <title>Mi Rutina Diaria</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- ENCABEZADO -->
+    <header class="hero card">
+
+      <div class="hero-top">
+
+        <div>
+          <p class="eyebrow">Agenda personal</p>
+          <h1>Mi Rutina Diaria</h1>
+        </div>
+
+        <div class="top-actions">
+
+          <button id="editBtn" class="button primary" type="button">
+            ⚙️ Editar rutina
+          </button>
+
+          <button id="resetBtn" class="button" type="button">
+            ↻ Reiniciar día
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="date-row">
+
+        <div>
+          <strong id="currentDate">—</strong>
+          <span id="currentDay">—</span>
+        </div>
+
+        <time id="clock">00:00:00</time>
+
+      </div>
+
+
+      <!-- PROGRESO -->
+      <section class="progress card-inner">
+
+        <div class="progress-heading">
+          <span>Avance del día</span>
+
+          <strong>
+            <span id="progressPercent">0</span>%
+          </strong>
+        </div>
+
+        <div class="progress-bar">
+          <div id="progressFill"></div>
+        </div>
+
+        <div class="summary-grid">
+
+          <div>
+            <span>Completadas</span>
+
+            <strong>
+              <span id="completedCount">0</span> /
+              <span id="totalCount">0</span>
+            </strong>
+          </div>
+
+          <div>
+            <span>Hora de dormir</span>
+            <strong id="sleepTime">23:00</strong>
+          </div>
+
+        </div>
+
+      </section>
+
+    </header>
+
+
+    <!-- ACTIVIDAD ACTUAL -->
+    <section
+      id="currentActivityCard"
+      class="card highlight"
+      hidden
+    >
+
+      <p class="label">ACTIVIDAD ACTUAL</p>
+
+      <div class="highlight-row">
+
+        <div>
+
+          <p
+            id="currentActivityTime"
+            class="muted"
+          >
+            —
+          </p>
+
+          <h2 id="currentActivityName">
+            —
+          </h2>
+
+          <span
+            id="timeRemaining"
+            class="badge"
+          >
+            —
+          </span>
+
+        </div>
+
+        <span
+          id="currentActivityEmoji"
+          class="big-emoji"
+        >
+          ⏳
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- TIEMPO LIBRE -->
+    <section
+      id="freeTimeCard"
+      class="card highlight free"
+      hidden
+    >
+
+      <p class="label">
+        TIEMPO LIBRE / TRANSICIÓN
+      </p>
+
+      <div class="highlight-row">
+
+        <div>
+
+          <h2>
+            Tiempo libre / transición
+          </h2>
+
+          <p
+            id="freeTimeText"
+            class="muted"
+          >
+            No hay una actividad programada en este momento.
+          </p>
+
+        </div>
+
+        <span class="big-emoji">
+          ✨
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- PRÓXIMA ACTIVIDAD -->
+    <section
+      id="nextActivityCard"
+      class="card next"
+      hidden
+    >
+
+      <p class="label">
+        PRÓXIMA ACTIVIDAD
+      </p>
+
+      <div class="next-row">
+
+        <span
+          id="nextActivityEmoji"
+          class="big-emoji small"
+        >
+          ➡️
+        </span>
+
+        <div>
+
+          <p
+            id="nextActivityTime"
+            class="muted"
+          >
+            —
+          </p>
+
+          <h3 id="nextActivityName">
+            —
+          </h3>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- RESUMEN -->
+    <section class="card info">
+
+      <p class="label">
+        RESUMEN DEL DÍA
+      </p>
+
+      <ul>
+
+        <li>
+          <span>Actividades completadas</span>
+
+          <strong>
+            <span id="infoCompleted">0</span> /
+            <span id="infoTotal">0</span>
+          </strong>
+        </li>
+
+        <li>
+          <span>Avance</span>
+
+          <strong>
+            <span id="infoProgress">0</span>%
+          </strong>
+        </li>
+
+        <li>
+          <span>Próxima actividad</span>
+
+          <strong id="infoNext">
+            —
+          </strong>
+        </li>
+
+        <li>
+          <span>Hora de dormir</span>
+
+          <strong id="infoSleep">
+            23:00
+          </strong>
+        </li>
+
+      </ul>
+
+    </section>
+
+
+    <!-- ACTIVIDADES -->
+    <section
+      id="activitiesContainer"
+      class="activities"
+    ></section>
+
+  </main>
+
+
+  <!-- =====================================================
+       EDITOR DE RUTINA
+       ===================================================== -->
+
+  <div
+    id="editorOverlay"
+    class="overlay"
+    hidden
+  >
+
+    <div class="modal editor-modal">
+
+      <div class="modal-header">
+
+        <div>
+
+          <p class="eyebrow">
+            Configuración
+          </p>
+
+          <h2>
+            Editar rutina
+          </h2>
+
+        </div>
+
+        <button
+          id="closeEditorBtn"
+          class="icon-button"
+          type="button"
+          aria-label="Cerrar"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <button
+          id="addSectionBtn"
+          class="button primary"
+          type="button"
+        >
+          ＋ Nueva sección
+        </button>
+
+        <button
+          id="exportBtn"
+          class="button"
+          type="button"
+        >
+          📤 Exportar
+        </button>
+
+        <label class="button file-button">
+
+          📥 Importar
+
+          <input
+            id="importInput"
+            type="file"
+            accept=".json,application/json"
+            hidden
+          >
+
+        </label>
+
+        <button
+          id="restoreBtn"
+          class="button danger-soft"
+          type="button"
+        >
+          ↺ Restaurar original
+        </button>
+
+      </div>
+
+
+      <p class="editor-help">
+
+        Los cambios se guardan automáticamente en este dispositivo.
+        Las actividades se ordenan por horario dentro de cada sección.
+
+      </p>
+
+
+      <div id="editorSections"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       FORMULARIO DE ACTIVIDAD
+       ===================================================== -->
+
+  <div
+    id="activityOverlay"
+    class="overlay"
+    hidden
+  >
+
+    <div class="modal form-modal">
+
+      <div class="modal-header">
+
+        <div>
+
+          <p
+            class="eyebrow"
+            id="formEyebrow"
+          >
+            Nueva actividad
+          </p>
+
+          <h2 id="formTitle">
+            Agregar actividad
+          </h2>
+
+        </div>
+
+        <button
+          id="closeActivityBtn"
+          class="icon-button"
+          type="button"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <form id="activityForm">
+
+        <input
+          id="editActivityId"
+          type="hidden"
+        >
+
+        <input
+          id="activitySectionId"
+          type="hidden"
+        >
+
+
+        <label>
+
+          Nombre de la actividad
+
+          <input
+            id="activityName"
+            type="text"
+            maxlength="120"
+            required
+            placeholder="Ej. Hacer ejercicio"
+          >
+
+        </label>
+
+
+        <div class="form-grid">
+
+          <label>
+
+            Emoji
+
+            <input
+              id="activityEmoji"
+              type="text"
+              maxlength="4"
+              value="📝"
+              placeholder="🏋️"
+            >
+
+          </label>
+
+
+          <label>
+
+            Sección
+
+            <select id="activitySection"></select>
+
+          </label>
+
+        </div>
+
+
+        <div class="form-grid">
+
+          <label>
+
+            Hora de inicio
+
+            <input
+              id="activityStart"
+              type="time"
+              required
+            >
+
+          </label>
+
+
+          <label>
+
+            Hora de finalización
+
+            <input
+              id="activityEnd"
+              type="time"
+              required
+            >
+
+          </label>
+
+        </div>
+
+
+        <div
+          id="formError"
+          class="form-error"
+          hidden
+        ></div>
+
+
+        <div class="form-actions">
+
+          <button
+            id="cancelActivityBtn"
+            class="button"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            class="button primary"
+            type="submit"
+          >
+            Guardar actividad
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       FORMULARIO DE SECCIÓN
+       ===================================================== -->
+
+  <div
+    id="sectionOverlay"
+    class="overlay"
+    hidden
+  >
+
+    <div class="modal form-modal small-modal">
+
+      <div class="modal-header">
+
+        <div>
+
+          <p class="eyebrow">
+            Configuración
+          </p>
+
+          <h2>
+            Nueva sección
+          </h2>
+
+        </div>
+
+        <button
+          id="closeSectionBtn"
+          class="icon-button"
+          type="button"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <form id="sectionForm">
+
+        <label>
+
+          Nombre de la sección
+
+          <input
+            id="sectionName"
+            type="text"
+            maxlength="50"
+            required
+            placeholder="Ej. Ejercicio"
+          >
+
+        </label>
+
+
+        <label>
+
+          Emoji
+
+          <input
+            id="sectionEmoji"
+            type="text"
+            maxlength="4"
+            value="📌"
+            placeholder="📌"
+          >
+
+        </label>
+
+
+        <div class="form-actions">
+
+          <button
+            id="cancelSectionBtn"
+            class="button"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            class="button primary"
+            type="submit"
+          >
+            Crear sección
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
