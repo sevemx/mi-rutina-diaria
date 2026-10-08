@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Rutina Diaria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom smooth scroll */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        /* Animations */
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Toast notifications */
+        .toast-enter {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        .toast-enter-active {
+            transform: translateY(0);
+            opacity: 1;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .toast-exit-active {
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex justify-center transition-colors duration-300 pb-24 sm:pb-12">
+
+    <main class="w-full max-w-md sm:max-w-xl bg-white dark:bg-slate-900 min-h-screen sm:min-h-[92vh] sm:mt-8 sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col relative border border-slate-200/60 dark:border-slate-800">
+        
+        <!-- Header & Theme Toggle -->
+        <header class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-5 pb-6 rounded-b-3xl shadow-lg relative z-10">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="bg-white/20 p-2 rounded-xl backdrop-blur-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path></svg>
+                    </div>
+                    <h1 class="text-xl font-bold tracking-tight">Mi Rutina Diaria</h1>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Streak badge -->
+                    <div id="streak-badge" class="flex items-center gap-1 bg-amber-500/30 border border-amber-300/40 px-2.5 py-1 rounded-full text-xs font-semibold text-amber-100 backdrop-blur-sm" title="Racha de días cumplidos">
+                        🔥 <span id="streak-count">0</span> días
+                    </div>
+                    <!-- Theme switch -->
+                    <button id="btn-theme-toggle" class="p-2 rounded-xl bg-white/10 hover:bg-white/25 transition backdrop-blur-md text-white">
+                        <svg id="icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm8,56H184a8,8,0,0,0,0,16h16a8,8,0,0,0,0-16ZM56,120H40a8,8,0,0,0,0,16H56a8,8,0,0,0,0-16Zm72,72a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V200A8,8,0,0,0,128,192ZM52.69,63.76A8,8,0,0,0,63.76,52.69l11.31,11.32a8,8,0,0,0-11.32,11.32Zm129.55,129.55a8,8,0,0,0,11.32,11.32l11.31-11.32a8,8,0,0,0-11.32-11.32ZM186.34,63.76,175.03,75.07a8,8,0,0,0,11.32,11.32l11.31-11.32a8,8,0,0,0-11.32-11.32ZM63.76,192.24l11.31-11.31a8,8,0,0,0-11.32-11.32L52.44,180.92a8,8,0,0,0,11.32,11.32Z"></path></svg>
+                        <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M234,131.24A104,104,0,0,1,124.76,22,8,8,0,0,0,118,29.17a88,88,0,1,0,108.83,108.83,8,8,0,0,0,7.17-6.76Z"></path></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Date Navigator -->
+            <div class="flex justify-between items-center bg-indigo-800/40 rounded-2xl p-1.5 backdrop-blur-md border border-white/10">
+                <button id="btn-prev-day" class="p-2 rounded-xl hover:bg-white/20 transition active:scale-95 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"></path></svg>
+                </button>
+                <div class="text-center font-medium cursor-pointer py-1 px-3 rounded-lg hover:bg-white/10 transition" id="current-date-display" onclick="resetToToday()" title="Ir a hoy">
+                    <!-- Date inserted by JS -->
+                </div>
+                <button id="btn-next-day" class="p-2 rounded-xl hover:bg-white/20 transition active:scale-95 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+            
+            <!-- Progress & Stats Card -->
+            <div class="bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/70 p-4 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Progreso Diario</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                        <h2 class="text-3xl font-black tracking-tight" id="progress-text">0%</h2>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 font-medium" id="progress-detail">0 de 0 actividades</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="active-now-indicator">Actual: Ninguna activa</p>
+                </div>
+                
+                <!-- Circular Progress Ring -->
+                <div class="relative w-20 h-20 flex-shrink-0">
+                    <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" class="text-slate-200 dark:text-slate-700" stroke-width="8"></circle>
+                        <circle id="progress-ring" class="transition-all duration-500 ease-out" cx="50" cy="50" r="40" fill="none" stroke="#6366f1" stroke-width="8" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center text-xs font-bold">
+                        <span id="ring-emoji">🎯</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Toolbar -->
+            <div class="grid grid-cols-2 gap-2.5">
+                <button id="btn-copy-prev" class="bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-2 active:scale-98">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path></svg>
+                    Repetir ayer
+                </button>
+                <button id="btn-clear-day" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-semibold py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-2 active:scale-98">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192Z"></path></svg>
+                    Limpiar día
+                </button>
+            </div>
+
+            <!-- Night Sleep Schedule Setup -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/70 p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                        <span class="text-lg">🌙</span> Configurar Descanso Nocturno
+                    </h3>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Hora de Dormir</label>
+                        <input type="time" id="sleep-start" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Hora de Despertar</label>
+                        <input type="time" id="sleep-end" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Activity Form -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/80 dark:border-slate-700/70 p-4 shadow-sm">
+                <h3 class="text-sm font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-200 mb-3">
+                    <span class="text-lg">⚡</span> Nueva Actividad
+                </h3>
+                <div class="space-y-3">
+                    <input type="text" id="activity-name" placeholder="Ej. Desayunar, Ejercicio, Lectura..." class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm">
+                    
+                    <div class="flex gap-2">
+                        <select id="activity-duration" class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition shadow-sm">
+                            <option value="15">⏱️ 15 minutos</option>
+                            <option value="30">⏱️ 30 minutos</option>
+                            <option value="45">⏱️ 45 minutos</option>
+                            <option value="60" selected>⏳ 1 hora</option>
+                            <option value="120">⏳ 2 horas</option>
+                            <option value="180">⏳ 3 horas</option>
+                            <option value="240">⏳ 4 horas</option>
+                        </select>
+                        <button id="btn-add-activity" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-xl transition shadow-md active:scale-95 text-sm flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline / Agenda List -->
+            <div>
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Cronograma del Día</h3>
+                    <span id="activity-count-tag" class="text-xs bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-semibold px-2 py-0.5 rounded-full">0 bloques</span>
+                </div>
+                
+                <div class="relative border-l-2 border-indigo-200 dark:border-indigo-900 ml-3.5 pl-5 space-y-4" id="activities-list">
+                    <!-- Activities inserted dynamically -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="text-center py-12 px-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl mt-2">
+                    <div class="text-4xl mb-2">📋</div>
+                    <h4 class="font-semibold text-slate-700 dark:text-slate-300 text-sm">Tu día está libre</h4>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs mt-1 max-w-xs mx-auto">Agrega tus actividades para que se organicen automáticamente en orden acumulativo desde tu hora de despertar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions Bar -->
+        <div class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-3 grid grid-cols-3 gap-2 z-10 rounded-b-3xl">
+            <button id="btn-export-csv" class="flex flex-col items-center justify-center gap-1 py-2 px-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition border border-slate-200/80 dark:border-slate-700 text-xs font-medium active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,152v56a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V152a8,8,0,0,1,16,0v56H208V152a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,132.69V24a8,8,0,0,0-16,0V132.69l-26.34-26.35a8,8,0,0,0-11.32,11.32Z"></path></svg>
+                Excel/CSV
+            </button>
+            <button id="btn-share-wa" class="flex flex-col items-center justify-center gap-1 py-2 px-2 rounded-xl bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-300 transition border border-green-200/80 dark:border-green-800/50 text-xs font-medium active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M187.58,144.84l-32-16a8,8,0,0,0-8,1.5l-19.24,16a5.36,5.36,0,0,1-4.08,1.2,71.25,71.25,0,0,1-41.68-23.7,71.25,71.25,0,0,1-23.7-41.68,5.36,5.36,0,0,1,1.2-4.08l16-19.24a8,8,0,0,0,1.5-8l-16-32a8,8,0,0,0-9.68-4l-24,7.21A16,16,0,0,0,16,36.92C18.42,126,92.05,199.1,180.22,201.27a15.86,15.86,0,0,0,16.59-11.31l7.21-24A8,8,0,0,0,187.58,144.84Z"></path></svg>
+                WhatsApp
+            </button>
+            <button id="btn-backup-json" class="flex flex-col items-center justify-center gap-1 py-2 px-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition border border-slate-200/80 dark:border-slate-700 text-xs font-medium active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a96,96,0,1,1-96-96A96,96,0,0,1,224,128Zm-16,0a80,80,0,1,0-80,80A80.09,80.09,0,0,0,208,128Zm-88-40v40a8,8,0,0,0,8,8h32a8,8,0,0,0,0-16H128V88a8,8,0,0,0-16,0Z"></path></svg>
+                Respaldo
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs pointer-events-none px-4"></div>
+
+    <script>
+        // State Management
+        let currentDate = new Date();
+        let appData = {
+            routines: {},
+            streaks: 0,
+            lastCompletedDate: null
+        };
+
+        const DEFAULT_SLEEP_START = "23:00";
+        const DEFAULT_SLEEP_END = "07:00";
+
+        // DOM Element references
+        const elDateDisplay = document.getElementById('current-date-display');
+        const btnPrevDay = document.getElementById('btn-prev-day');
+        const btnNextDay = document.getElementById('btn-next-day');
+        const btnCopyPrev = document.getElementById('btn-copy-prev');
+        const btnClearDay = document.getElementById('btn-clear-day');
+        
+        const inSleepStart = document.getElementById('sleep-start');
+        const inSleepEnd = document.getElementById('sleep-end');
+        
+        const inActivityName = document.getElementById('activity-name');
+        const inActivityDuration = document.getElementById('activity-duration');
+        const btnAddActivity = document.getElementById('btn-add-activity');
+        
+        const listActivities = document.getElementById('activities-list');
+        const emptyState = document.getElementById('empty-state');
+        const activityCountTag = document.getElementById('activity-count-tag');
+        
+        const textProgress = document.getElementById('progress-text');
+        const textProgressDetail = document.getElementById('progress-detail');
+        const ringProgress = document.getElementById('progress-ring');
+        const ringEmoji = document.getElementById('ring-emoji');
+        const activeNowIndicator = document.getElementById('active-now-indicator');
+        
+        const streakCountDisplay = document.getElementById('streak-count');
+        const btnThemeToggle = document.getElementById('btn-theme-toggle');
+        const iconSun = document.getElementById('icon-sun');
+        const iconMoon = document.getElementById('icon-moon');
+        
+        const btnExportCsv = document.getElementById('btn-export-csv');
+        const btnShareWa = document.getElementById('btn-share-wa');
+        const btnBackupJson = document.getElementById('btn-backup-json');
+
+        // Load data from localStorage
+        function loadStorage() {
+            const saved = localStorage.getItem('mi_rutina_diaria_data');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch(e) {
+                    console.error("Error reading storage", e);
+                }
+            }
+            // Load theme preference
+            const savedTheme = localStorage.getItem('mi_rutina_theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                iconSun.classList.remove('hidden');
+                iconMoon.classList.add('hidden');
+            }
+        }
+
+        function saveStorage() {
+            localStorage.setItem('mi_rutina_diaria_data', JSON.stringify(appData));
+            updateStreaksCalculation();
+        }
+
+        // Theme Toggle Handler
+        btnThemeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('mi_rutina_theme', isDark ? 'dark' : 'light');
+            if (isDark) {
+                iconSun.classList.remove('hidden');
+                iconMoon.classList.add('hidden');
+            } else {
+                iconSun.classList.add('hidden');
+                iconMoon.classList.remove('hidden');
+            }
+        });
+
+        // Date Helpers
+        function getDateString(dateObj) {
+            const yyyy = dateObj.getFullYear();
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function getReadableDate(dateObj) {
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            let str = dateObj.toLocaleDateString('es-ES', options);
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function timeToMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return (h * 60) + m;
+        }
+
+        function minutesToTime(minutes) {
+            let m = Math.round(minutes);
+            let h = Math.floor(m / 60) % 24;
+            let min = m % 60;
+            return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+        }
+
+        function getCurrentDayData() {
+            const dateStr = getDateString(currentDate);
+            if (!appData.routines[dateStr]) {
+                appData.routines[dateStr] = {
+                    sleepStart: DEFAULT_SLEEP_START,
+                    sleepEnd: DEFAULT_SLEEP_END,
+                    activities: []
+                };
+            }
+            return appData.routines[dateStr];
+        }
+
+        // Streak & Gamification Logic
+        function updateStreaksCalculation() {
+            // Check days completed (>80% progress)
+            let currentStreak = 0;
+            let checkDate = new Date();
+            
+            // Loop backwards from today
+            for (let i = 0; i < 30; i++) {
+                const dateStr = getDateString(checkDate);
+                const day = appData.routines[dateStr];
+                if (day && day.activities.length > 0) {
+                    const completed = day.activities.filter(a => a.completed).length;
+                    const pct = (completed / day.activities.length) * 100;
+                    if (pct >= 80) {
+                        currentStreak++;
+                    } else if (i > 0) {
+                        // If not today and below 80, streak breaks
+                        break;
+                    }
+                } else if (i > 0) {
+                    // Empty past day breaks streak if skipped
+                    break;
+                }
+                checkDate.setDate(checkDate.getDate() - 1);
+            }
+            appData.streaks = currentStreak;
+            streakCountDisplay.innerText = currentStreak;
+        }
+
+        // Main Render Engine
+        function renderUI() {
+            const dateStr = getDateString(currentDate);
+            const todayStr = getDateString(new Date());
+            
+            let labelTitle = getReadableDate(currentDate);
+            if (dateStr === todayStr) labelTitle = "Hoy, " + labelTitle;
+            
+            elDateDisplay.innerHTML = `<div class="text-sm font-bold text-white">${labelTitle}</div><div class="text-[10px] text-indigo-200">Gestiona tu tiempo</div>`;
+            
+            const data = getCurrentDayData();
+            inSleepStart.value = data.sleepStart;
+            inSleepEnd.value = data.sleepEnd;
+
+            renderActivities(data);
+            updateProgressAndStats(data);
+        }
+
+        function renderActivities(data) {
+            listActivities.innerHTML = '';
+            activityCountTag.innerText = `${data.activities.length} bloques`;
+            
+            if (data.activities.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            let currentTimeMinutes = timeToMinutes(data.sleepEnd);
+            const nowMinutes = getCurrentTimeInMinutes();
+
+            data.activities.forEach((act, index) => {
+                const startTimeMins = currentTimeMinutes;
+                const endTimeMins = currentTimeMinutes + act.duration;
+                const startTimeStr = minutesToTime(startTimeMins);
+                const endTimeStr = minutesToTime(endTimeMins);
+                
+                // Determine if this activity is currently ongoing right now (if viewing today)
+                const isToday = getDateString(currentDate) === getDateString(new Date());
+                const isCurrentActive = isToday && (nowMinutes >= startTimeMins && nowMinutes < endTimeMins);
+
+                const el = document.createElement('div');
+                el.className = `relative flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                    isCurrentActive 
+                        ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-indigo-500 shadow-md ring-2 ring-indigo-400/30 animate-pulse-subtle' 
+                        : act.completed 
+                            ? 'bg-slate-50/60 dark:bg-slate-800/30 border-slate-200 dark:border-slate-800 opacity-75' 
+                            : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 shadow-sm'
+                }`;
+
+                // Timeline dot
+                const dotColor = isCurrentActive ? 'bg-indigo-600 ring-4 ring-indigo-200 dark:ring-indigo-900' : act.completed ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600';
+                const dotHtml = `<div class="absolute -left-[29px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 ${dotColor} shadow-sm"></div>`;
+
+                el.innerHTML = `
+                    ${dotHtml}
+                    <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
+                        <input type="checkbox" class="w-5 h-5 accent-indigo-600 rounded cursor-pointer transition" ${act.completed ? 'checked' : ''} onchange="toggleActivity(${act.id})">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-semibold text-sm truncate ${act.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'}">${act.name}</h4>
+                                ${isCurrentActive ? '<span class="text-[10px] bg-indigo-600 text-white font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Ahora</span>' : ''}
+                            </div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5 font-medium">
+                                <span>🕒 ${startTimeStr} - ${endTimeStr}</span>
+                                <span class="text-slate-300 dark:text-slate-600">•</span>
+                                <span>⏳ ${formatDurationText(act.duration)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="moveActivity(${index}, -1)" class="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition" title="Subir">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,165.66a8,8,0,0,1-11.32,0L128,91.31,53.66,165.66a8,8,0,0,1-11.32-11.32l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,213.66,165.66Z"></path></svg>
+                        </button>
+                        <button onclick="moveActivity(${index}, 1)" class="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition" title="Bajar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+                        </button>
+                        <button onclick="deleteActivity(${act.id})" class="p-1.5 text-slate-400 hover:text-red-500 transition" title="Eliminar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192Z"></path></svg>
+                        </button>
+                    </div>
+                `;
+                listActivities.appendChild(el);
+                currentTimeMinutes = endTimeMins;
+            });
+        }
+
+        function formatDurationText(mins) {
+            if (mins < 60) return `${mins} min`;
+            const h = Math.floor(mins / 60);
+            const m = mins % 60;
+            return m === 0 ? `${h}h` : `${h}h ${m}m`;
+        }
+
+        function getCurrentTimeInMinutes() {
+            const now = new Date();
+            return (now.getHours() * 60) + now.getMinutes();
+        }
+
+        function updateProgressAndStats(data) {
+            const total = data.activities.length;
+            const completed = data.activities.filter(a => a.completed).length;
+            const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+            textProgress.innerText = `${percentage}%`;
+            textProgressDetail.innerText = `${completed} de ${total} completadas`;
+
+            // Ring animation offset
+            const radius = 40;
+            const circumference = radius * 2 * Math.PI;
+            const offset = circumference - (percentage / 100) * circumference;
+            ringProgress.style.strokeDashoffset = offset;
+
+            // Emoji update based on percentage
+            if (percentage === 100 && total > 0) {
+                ringEmoji.innerText = '🏆';
+                ringProgress.style.stroke = '#10b981';
+            } else if (percentage >= 50) {
+                ringEmoji.innerText = '🔥';
+                ringProgress.style.stroke = '#6366f1';
+            } else {
+                ringEmoji.innerText = '🎯';
+                ringProgress.style.stroke = '#6366f1';
+            }
+
+            // Find current active activity
+            const isToday = getDateString(currentDate) === getDateString(new Date());
+            if (!isToday) {
+                activeNowIndicator.innerText = "📅 Visualizando otra fecha";
+            } else if (total === 0) {
+                activeNowIndicator.innerText = "⚡ Sin actividades configuradas";
+            } else {
+                let currMins = timeToMinutes(data.sleepEnd);
+                let foundActive = false;
+                for (let act of data.activities) {
+                    let startMins = currMins;
+                    let endMins = currMins + act.duration;
+                    let nowM = getCurrentTimeInMinutes();
+                    if (nowM >= startMins && nowM < endMins) {
+                        activeNowIndicator.innerText = `▶️ Ahora: ${act.name} (${minutesToTime(startMins)} - ${minutesToTime(endMins)})`;
+                        foundActive = true;
+                        break;
+                    }
+                    currMins = endMins;
+                }
+                if (!foundActive) {
+                    activeNowIndicator.innerText = "✨ Fuera de bloques activos programados";
+                }
+            }
+
+            saveStorage();
+        }
+
+        // Event Handlers & Actions
+        btnAddActivity.addEventListener('click', () => {
+            const name = inActivityName.value.trim();
+            const duration = parseInt(inActivityDuration.value);
+
+            if (!name) {
+                showToast("Escribe el nombre de la actividad", "error");
+                return;
+            }
+
+            const data = getCurrentDayData();
+            data.activities.push({
+                id: Date.now() + Math.random(),
+                name: name,
+                duration: duration,
+                completed: false
+            });
+
+            inActivityName.value = '';
+            renderUI();
+            showToast("Actividad agregada con éxito 🚀");
+        });
+
+        inActivityName.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnAddActivity.click();
+        });
+
+        window.toggleActivity = function(id) {
+            const data = getCurrentDayData();
+            const act = data.activities.find(a => a.id === id);
+            if (act) {
+                act.completed = !act.completed;
+                renderUI();
+            }
+        };
+
+        window.deleteActivity = function(id) {
+            const data = getCurrentDayData();
+            data.activities = data.activities.filter(a => a.id !== id);
+            renderUI();
+            showToast("Actividad eliminada");
+        };
+
+        window.moveActivity = function(index, direction) {
+            const data = getCurrentDayData();
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= data.activities.length) return;
+            
+            const temp = data.activities[index];
+            data.activities[index] = data.activities[newIndex];
+            data.activities[newIndex] = temp;
+            renderUI();
+        };
+
+        // Sleep setup change
+        inSleepStart.addEventListener('change', (e) => {
+            getCurrentDayData().sleepStart = e.target.value;
+            saveStorage();
+        });
+        inSleepEnd.addEventListener('change', (e) => {
+            getCurrentDayData().sleepEnd = e.target.value;
+            renderUI();
+        });
+
+        // Day Navigation
+        btnPrevDay.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() - 1);
+            renderUI();
+        });
+        btnNextDay.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() + 1);
+            renderUI();
+        });
+        window.resetToToday = function() {
+            currentDate = new Date();
+            renderUI();
+        };
+
+        // Repeat from previous day
+        btnCopyPrev.addEventListener('click', () => {
+            const prev = new Date(currentDate);
+            prev.setDate(prev.getDate() - 1);
+            const prevStr = getDateString(prev);
+            
+            if (appData.routines[prevStr] && appData.routines[prevStr].activities.length > 0) {
+                const currentData = getCurrentDayData();
+                const prevData = appData.routines[prevStr];
+                
+                currentData.sleepStart = prevData.sleepStart;
+                currentData.sleepEnd = prevData.sleepEnd;
+                currentData.activities = prevData.activities.map(a => ({
+                    ...a,
+                    id: Date.now() + Math.random(),
+                    completed: false
+                }));
+                renderUI();
+                showToast("Rutina del día anterior copiada 📋");
+            } else {
+                showToast("No hay registros en el día anterior", "error");
+            }
+        });
+
+        btnClearDay.addEventListener('click', () => {
+            if (confirm("¿Estás seguro de limpiar todas las actividades de este día?")) {
+                getCurrentDayData().activities = [];
+                renderUI();
+                showToast("Día reiniciado");
+            }
+        });
+
+        // Export to CSV / Excel compatible
+        btnExportCsv.addEventListener('click', () => {
+            const data = getCurrentDayData();
+            if (data.activities.length === 0) {
+                showToast("No hay datos para exportar", "error");
+                return;
+            }
+
+            let csv = "Actividad,Hora Inicio,Hora Fin,Duracion (min),Estado\n";
+            let curr = timeToMinutes(data.sleepEnd);
+            
+            data.activities.forEach(a => {
+                let start = minutesToTime(curr);
+                let endM = curr + a.duration;
+                let end = minutesToTime(endM);
+                let status = a.completed ? "Completado" : "Pendiente";
+                csv += `"${a.name.replace(/"/g, '""')}",${start},${end},${a.duration},${status}\n`;
+                curr = endM;
+            });
+
+            const blob = new Blob(["\uFEFF"+csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Rutina_${getDateString(currentDate)}.csv`;
+            link.click();
+            showToast("Reporte Excel descargado 📊");
+        });
+
+        // Share via WhatsApp
+        btnShareWa.addEventListener('click', () => {
+            const data = getCurrentDayData();
+            if (data.activities.length === 0) {
+                showToast("No hay rutina para compartir", "error");
+                return;
+            }
+
+            let text = `📅 *Mi Rutina Diaria: ${getReadableDate(currentDate)}*\n`;
+            text += `💤 Descanso: ${data.sleepStart} a ${data.sleepEnd}\n\n`;
+            
+            let curr = timeToMinutes(data.sleepEnd);
+            data.activities.forEach(a => {
+                let start = minutesToTime(curr);
+                let endM = curr + a.duration;
+                let end = minutesToTime(endM);
+                let icon = a.completed ? "✅" : "⏳";
+                text += `${icon} *${start} - ${end}*: ${a.name}\n`;
+                curr = endM;
+            });
+
+            const completed = data.activities.filter(a => a.completed).length;
+            const pct = Math.round((completed / data.activities.length) * 100);
+            text += `\n📊 *Progreso del día:* ${pct}%\n\n_Organizado con Mi Rutina Diaria_`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        });
+
+        // Backup JSON
+        btnBackupJson.addEventListener('click', () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `MiRutinaDiaria_Respaldo_${getDateString(new Date())}.json`);
+            dlAnchor.click();
+            showToast("Respaldo guardado con éxito 💾");
+        });
+
+        // Toast Notification Function
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bg = type === 'error' ? 'bg-red-600 text-white' : 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900';
+            
+            toast.className = `${bg} px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center justify-between toast-enter pointer-events-auto`;
+            toast.innerHTML = `<span>${msg}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-enter-active');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('toast-exit-active');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize
+        loadStorage();
+        renderUI();
+
+        // Auto-refresh active indicator every minute
+        setInterval(() => {
+            renderUI();
+        }, 60000);
+    </script>
+</body>
+</html>
+```
+@@eof
