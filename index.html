@@ -1,0 +1,3075 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<meta name="theme-color" content="#eef1f7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<title>Mi Rutina Diaria</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#eef1f7;
+  --card:#ffffff;
+  --text:#20242c;
+  --muted:#697180;
+  --line:#dfe3eb;
+  --primary:#315bea;
+  --primary2:#2348c9;
+  --ok:#16845b;
+  --danger:#d33d4d;
+  --shadow:0 10px 30px rgba(35,45,70,.09);
+  --radius:20px;
+  --soft:#f6f8fc;
+  --accent:#ffb84d;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:linear-gradient(180deg,#f5f7fb 0%,#eef1f7 100%);
+  color:var(--text);
+  font-family:'Nunito',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  min-height:100vh;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  border:0;
+}
+
+.app{
+  max-width:1050px;
+  margin:auto;
+  padding:18px 14px 40px;
+}
+
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+  padding:8px 2px;
+}
+
+h1{
+  font-size:28px;
+  margin:0 0 3px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+
+.subtitle{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:10px 14px;
+  border-radius:13px;
+  background:var(--card);
+  color:var(--text);
+  box-shadow:0 3px 10px rgba(0,0,0,.06);
+  font-weight:700;
+  transition:.18s transform,.18s box-shadow;
+}
+
+.btn:active{
+  transform:scale(.96);
+}
+
+.btn.primary{
+  background:linear-gradient(135deg,var(--primary),#5275ef);
+  color:#fff;
+  box-shadow:0 7px 16px rgba(49,91,234,.22);
+}
+
+.btn.danger{
+  color:#fff;
+  background:var(--danger);
+}
+
+.btn.small{
+  padding:8px 10px;
+  font-size:13px;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  margin-bottom:16px;
+  padding:3px;
+}
+
+.tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.tab{
+  white-space:nowrap;
+  padding:10px 16px;
+  border-radius:13px;
+  background:rgba(224,229,239,.75);
+  color:#4b5361;
+  font-weight:700;
+  transition:.18s;
+}
+
+.tab.active{
+  background:var(--text);
+  color:#fff;
+  box-shadow:0 5px 14px rgba(25,35,60,.13);
+}
+
+.card{
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(220,225,235,.8);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:17px;
+  margin-bottom:15px;
+  backdrop-filter:blur(8px);
+}
+
+.daybar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.daybar .date{
+  font-weight:800;
+  font-size:19px;
+  text-transform:capitalize;
+}
+
+.nav{
+  display:flex;
+  gap:7px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.stat{
+  background:linear-gradient(145deg,#f7f9fd,#eef2f8);
+  border-radius:16px;
+  padding:12px;
+  border:1px solid #e8ebf2;
+}
+
+.stat b{
+  display:block;
+  font-size:22px;
+}
+
+.stat span{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.progress{
+  height:11px;
+  background:#e4e8f0;
+  border-radius:99px;
+  overflow:hidden;
+  margin:13px 0 5px;
+}
+
+.progress>div{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,var(--primary),#7a94ff);
+  transition:.35s;
+}
+
+.progress-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.activity{
+  display:grid;
+  grid-template-columns:78px 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:14px 4px;
+  border-bottom:1px solid var(--line);
+  transition:.15s;
+}
+
+.activity:hover{
+  background:#fafbfe;
+  border-radius:14px;
+}
+
+.activity:last-child{
+  border-bottom:0;
+}
+
+.time{
+  font-weight:800;
+  font-size:13px;
+  color:var(--primary);
+  line-height:1.5;
+}
+
+.activity h3{
+  margin:0 0 5px;
+  font-size:16px;
+  font-weight:800;
+}
+
+.activity p{
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.activity.done h3{
+  text-decoration:line-through;
+  color:#8b919d;
+}
+
+.activity.done{
+  opacity:.65;
+}
+
+.check{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:2px solid #c5ccd8;
+  background:#fff;
+  color:#fff;
+  font-weight:800;
+  box-shadow:0 3px 8px rgba(0,0,0,.06);
+  transition:.18s;
+}
+
+.check.checked{
+  background:var(--ok);
+  border-color:var(--ok);
+  box-shadow:0 5px 12px rgba(22,132,91,.2);
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.section-title h2{
+  font-size:18px;
+  margin:0;
+  font-weight:800;
+}
+
+.cat{
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:99px;
+  background:#edf1f8;
+  color:#566072;
+  font-weight:700;
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:38px 10px;
+  font-weight:600;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+label{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:700;
+}
+
+input,
+select{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#fff;
+  color:var(--text);
+  outline:none;
+}
+
+input:focus,
+select:focus{
+  border-color:var(--primary);
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(20,25,35,.45);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:12px;
+  z-index:20;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:min(700px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:var(--card);
+  border-radius:24px;
+  padding:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-head h2{
+  margin:0;
+  font-size:20px;
+}
+
+.close{
+  background:#edf0f5;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  font-size:20px;
+}
+
+.list-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.list-row:last-child{
+  border:0;
+}
+
+.list-row small{
+  color:var(--muted);
+}
+
+.recur-box{
+  background:#f6f8fc;
+  border-radius:14px;
+  padding:12px;
+  margin-top:12px;
+}
+
+.days{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:7px;
+}
+
+.day-chip{
+  padding:8px 10px;
+  border-radius:10px;
+  background:#e2e7f0;
+}
+
+.day-chip.active{
+  background:var(--primary);
+  color:#fff;
+}
+
+.notice{
+  padding:10px 12px;
+  background:#eef4ff;
+  border-left:4px solid var(--primary);
+  border-radius:10px;
+  color:#43516b;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+/* MODO OSCURO */
+
+body.dark{
+  --bg:#101318;
+  --card:#181c23;
+  --text:#eef1f7;
+  --muted:#a7afbd;
+  --line:#2b313c;
+  --primary:#7190ff;
+  --primary2:#5878f0;
+}
+
+body.dark{
+  background:linear-gradient(180deg,#0f1217,#151922);
+}
+
+body.dark .card{
+  background:rgba(24,28,35,.96);
+}
+
+body.dark .stat,
+body.dark .recur-box{
+  background:#20252e;
+}
+
+body.dark .activity:hover{
+  background:#20252e;
+}
+
+body.dark input,
+body.dark select{
+  background:#15191f;
+  color:var(--text);
+}
+
+body.dark .tab{
+  background:#272d38;
+  color:#c9cfda;
+}
+
+body.dark .tab.active{
+  background:#eef1f7;
+  color:#15191f;
+}
+
+body.dark .day-chip{
+  background:#2b313c;
+}
+
+body.dark .close{
+  background:#2b313c;
+  color:#fff;
+}
+
+/* CELULAR */
+
+@media(max-width:650px){
+
+  .app{
+    padding:14px 10px 30px;
+  }
+
+  h1{
+    font-size:23px;
+  }
+
+  .header-actions .btn span{
+    display:none;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr 1fr;
+  }
+
+  .stat{
+    padding:10px 8px;
+  }
+
+  .stat b{
+    font-size:18px;
+  }
+
+  .activity{
+    grid-template-columns:68px 1fr auto;
+    gap:8px;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .field.full{
+    grid-column:auto;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+
+  <div>
+
+    <h1>🌤️ Mi Rutina Diaria</h1>
+
+    <div class="subtitle">
+      Organiza tu día, una actividad a la vez.
+    </div>
+
+  </div>
+
+  <div class="header-actions">
+
+    <button class="btn" onclick="toggleDark()">
+      🌙 <span>Modo</span>
+    </button>
+
+    <button class="btn primary" onclick="openActivity()">
+      ＋ <span>Actividad</span>
+    </button>
+
+  </div>
+
+</header>
+
+
+<div class="tabs">
+
+  <button
+    class="tab active"
+    id="tabToday"
+    onclick="setView('today')">
+    🏠 Hoy
+  </button>
+
+  <button
+    class="tab"
+    id="tabWeek"
+    onclick="setView('week')">
+    📅 Semana
+  </button>
+
+  <button
+    class="tab"
+    id="tabRecurring"
+    onclick="setView('recurring')">
+    🔁 Recurrentes
+  </button>
+
+  <button
+    class="tab"
+    id="tabSettings"
+    onclick="setView('settings')">
+    ⚙️ Configuración
+  </button>
+
+</div>
+
+
+<main id="main"></main>
+
+</div>
+
+
+<!-- MODAL ACTIVIDAD -->
+
+<div class="modal" id="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h2 id="modalTitle">
+        Nueva actividad
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeModal()">
+        ×
+      </button>
+
+    </div>
+
+
+    <form
+      id="activityForm"
+      onsubmit="saveActivity(event)">
+
+      <input
+        type="hidden"
+        id="editId">
+
+
+      <div
+        class="form-grid"
+        style="margin-top:14px">
+
+
+        <div class="field full">
+
+          <label>
+            Actividad
+          </label>
+
+          <input
+            id="name"
+            required
+            placeholder="Ej. Desayunar">
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Hora de inicio
+          </label>
+
+          <input
+            id="start"
+            type="time"
+            required>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Hora de fin
+          </label>
+
+          <input
+            id="end"
+            type="time"
+            required>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Categoría
+          </label>
+
+          <select id="category"></select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Tipo
+          </label>
+
+          <select id="type">
+
+            <option value="specific">
+              Solo este día
+            </option>
+
+            <option value="recurring">
+              🔁 Recurrente
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            Notas
+          </label>
+
+          <input
+            id="notes"
+            placeholder="Detalles, pendientes, recordatorios...">
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="recurrenceFields"
+        class="recur-box"
+        style="display:none">
+
+        <b>
+          🔁 Repetir en:
+        </b>
+
+        <div
+          class="days"
+          id="dayChoices">
+        </div>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          class="btn primary"
+          type="submit">
+          💾 Guardar actividad
+        </button>
+
+        <button
+          class="btn"
+          type="button"
+          onclick="closeModal()">
+          Cancelar
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- MODAL SUEÑO -->
+
+<div class="modal" id="sleepModal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h2>
+        🌙 Horario de sueño
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeSleep()">
+        ×
+      </button>
+
+    </div>
+
+
+    <p class="subtitle">
+
+      Puedes indicar un horario que cruce la medianoche,
+      por ejemplo 23:00 a 07:00.
+
+    </p>
+
+
+    <div
+      class="form-grid"
+      style="margin-top:14px">
+
+
+      <div class="field">
+
+        <label>
+          Hora de dormir
+        </label>
+
+        <input
+          id="sleepStart"
+          type="time">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Hora de despertar
+        </label>
+
+        <input
+          id="sleepEnd"
+          type="time">
+
+      </div>
+
+
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        class="btn primary"
+        onclick="saveSleep()">
+        💾 Guardar sueño
+      </button>
+
+      <button
+        class="btn"
+        onclick="closeSleep()">
+        Cancelar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const KEY = 'mi_rutina_diaria_single_v1';
+
+const DAYS = [
+  'Domingo',
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado'
+];
+
+const DAYSHORT = [
+  'D',
+  'L',
+  'M',
+  'X',
+  'J',
+  'V',
+  'S'
+];
+
+
+let data = JSON.parse(
+  localStorage.getItem(KEY) || 'null'
+) || {
+
+  categories:[
+    'Mañana',
+    'Trabajo',
+    'Tarde',
+    'Noche',
+    'Personal'
+  ],
+
+  activities:[],
+
+  sleep:{
+    start:'23:00',
+    end:'07:00'
+  },
+
+  theme:'light'
+
+};
+
+
+let current = new Date();
+
+current.setHours(
+  0,
+  0,
+  0,
+  0
+);
+
+
+let view = 'today';
+
+
+/* ==========================================
+   UTILIDADES
+========================================== */
+
+function save(){
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(data)
+  );
+
+}
+
+
+function iso(d){
+
+  return d.toISOString().slice(
+    0,
+    10
+  );
+
+}
+
+
+function dateLabel(d){
+
+  return d.toLocaleDateString(
+    'es-MX',
+    {
+      weekday:'long',
+      day:'numeric',
+      month:'long',
+      year:'numeric'
+    }
+  );
+
+}
+
+
+function uid(){
+
+  return Date.now().toString(36)
+    +
+    Math.random()
+      .toString(36)
+      .slice(2,7);
+
+}
+
+
+function mins(t){
+
+  let [
+    h,
+    m
+  ] = t.split(':').map(Number);
+
+  return h * 60 + m;
+
+}
+
+
+function fmt(t){
+
+  let [
+    h,
+    m
+  ] = t.split(':').map(Number);
+
+  let ap = h >= 12
+    ? 'PM'
+    : 'AM';
+
+  let hh = h % 12 || 12;
+
+  return `${hh}:${String(m).padStart(2,'0')} ${ap}`;
+
+}
+
+
+function esc(s){
+
+  return String(s || '')
+    .replace(
+      /[&<>"']/g,
+      c => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#39;'
+      }[c])
+    );
+
+}
+
+
+function sortActs(a,b){
+
+  return mins(a.start)
+    -
+    mins(b.start);
+
+}
+
+
+/* ==========================================
+   ACTIVIDADES
+========================================== */
+
+function effectiveActivities(date){
+
+  const day = iso(date);
+
+  const dow = date.getDay();
+
+
+  const specific =
+    data.activities.filter(
+      a =>
+        a.kind === 'specific'
+        &&
+        a.date === day
+    );
+
+
+  const recurring =
+    data.activities
+      .filter(
+        a =>
+          a.kind === 'recurring'
+          &&
+          a.days.includes(dow)
+      )
+      .map(
+        a => ({
+          ...a,
+          virtual:true,
+          sourceId:a.id
+        })
+      );
+
+
+  return [
+    ...specific,
+    ...recurring
+  ].sort(sortActs);
+
+}
+
+
+function isDone(a,date){
+
+  const day = iso(date);
+
+  const id =
+    a.virtual
+      ? a.sourceId
+      : a.id;
+
+
+  const activity =
+    data.activities.find(
+      v => v.id === id
+    );
+
+
+  return !!(
+    activity &&
+    activity.done &&
+    activity.done[day]
+  );
+
+}
+
+
+function toggleDone(a){
+
+  const id =
+    a.virtual
+      ? a.sourceId
+      : a.id;
+
+  const day = iso(current);
+
+
+  const x =
+    data.activities.find(
+      v => v.id === id
+    );
+
+
+  if(!x)
+    return;
+
+
+  x.done = x.done || {};
+
+  x.done[day] =
+    !x.done[day];
+
+
+  save();
+
+  render();
+
+}
+
+
+/* ==========================================
+   ICONOS AUTOMÁTICOS
+========================================== */
+
+function iconFor(a){
+
+  const n =
+    (a.name || '')
+    .toLowerCase();
+
+  const c =
+    (a.category || '')
+    .toLowerCase();
+
+
+  if(
+    n.includes('desay')
+    ||
+    n.includes('comid')
+    ||
+    n.includes('cen')
+    ||
+    n.includes('comer')
+  )
+    return '🍽️';
+
+
+  if(
+    n.includes('perro')
+    ||
+    n.includes('mascot')
+    ||
+    n.includes('sacar')
+  )
+    return '🐶';
+
+
+  if(
+    n.includes('dorm')
+    ||
+    n.includes('sueñ')
+    ||
+    c.includes('noche')
+  )
+    return '🌙';
+
+
+  if(
+    n.includes('trabaj')
+    ||
+    n.includes('public')
+    ||
+    n.includes('program')
+  )
+    return '💻';
+
+
+  if(
+    n.includes('limp')
+    ||
+    n.includes('traste')
+    ||
+    n.includes('lavar')
+  )
+    return '🧹';
+
+
+  if(
+    n.includes('bañ')
+    ||
+    n.includes('ducha')
+  )
+    return '🚿';
+
+
+  if(
+    n.includes('compr')
+  )
+    return '🛒';
+
+
+  if(
+    n.includes('plant')
+  )
+    return '🌱';
+
+
+  if(
+    n.includes('caminar')
+    ||
+    n.includes('pase')
+  )
+    return '🚶';
+
+
+  if(
+    n.includes('ejerc')
+    ||
+    n.includes('gimnas')
+  )
+    return '🏃';
+
+
+  if(
+    n.includes('descans')
+  )
+    return '☕';
+
+
+  return '✨';
+
+}
+
+
+/* ==========================================
+   VISTAS
+========================================== */
+
+function setView(v){
+
+  view = v;
+
+
+  document
+    .querySelectorAll('.tab')
+    .forEach(
+      x =>
+        x.classList.remove('active')
+    );
+
+
+  const id =
+    v === 'today'
+      ? 'tabToday'
+      : v === 'week'
+        ? 'tabWeek'
+        : v === 'recurring'
+          ? 'tabRecurring'
+          : 'tabSettings';
+
+
+  document
+    .getElementById(id)
+    .classList.add('active');
+
+
+  render();
+
+}
+
+
+function render(){
+
+  if(view === 'today')
+    renderToday();
+
+  else if(view === 'week')
+    renderWeek();
+
+  else if(view === 'recurring')
+    renderRecurring();
+
+  else
+    renderSettings();
+
+}
+
+
+/* ==========================================
+   HOY
+========================================== */
+
+function renderToday(){
+
+  const acts =
+    effectiveActivities(current);
+
+
+  const done =
+    acts.filter(
+      a =>
+        isDone(a,current)
+    ).length;
+
+
+  const pct =
+    acts.length
+      ? Math.round(
+          done / acts.length * 100
+        )
+      : 0;
+
+
+  main.innerHTML = `
+
+  <div class="card">
+
+    <div class="daybar">
+
+      <div>
+
+        <div class="date">
+          ${dateLabel(current)}
+        </div>
+
+        <div class="subtitle">
+
+          ${
+            current.getTime()
+            ===
+            new Date(
+              new Date()
+                .setHours(0,0,0,0)
+            ).getTime()
+
+            ? '✨ Tu día de hoy'
+
+            : '📅 Vista del día seleccionado'
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="nav">
+
+        <button
+          class="btn small"
+          onclick="moveDay(-1)">
+          ‹
+        </button>
+
+        <button
+          class="btn small"
+          onclick="goToday()">
+          Hoy
+        </button>
+
+        <button
+          class="btn small"
+          onclick="moveDay(1)">
+          ›
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="progress">
+
+      <div
+        style="width:${pct}%">
+      </div>
+
+    </div>
+
+
+    <div class="progress-label">
+
+      <span>
+        ${done} de ${acts.length}
+        actividades completadas
+      </span>
+
+      <b>
+        ${pct}%
+      </b>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <b>
+          ${acts.length}
+        </b>
+
+        <span>
+          📋 Actividades
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <b>
+          ${done}
+        </b>
+
+        <span>
+          ✅ Completadas
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <b>
+          ${100-pct}%
+        </b>
+
+        <span>
+          ⏳ Pendiente
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>
+        📝 Rutina del día
+      </h2>
+
+      <button
+        class="btn small primary"
+        onclick="openActivity()">
+        ＋ Agregar
+      </button>
+
+    </div>
+
+
+    ${
+      acts.length
+
+      ?
+
+      acts
+        .map(
+          a =>
+            activityHTML(a)
+        )
+        .join('')
+
+      :
+
+      `
+      <div class="empty">
+
+        🌱
+
+        <br><br>
+
+        No hay actividades
+        para este día.
+
+        <br><br>
+
+        <button
+          class="btn primary"
+          onclick="openActivity()">
+
+          ＋ Agregar primera actividad
+
+        </button>
+
+      </div>
+      `
+    }
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>
+        🌙 Sueño
+      </h2>
+
+      <button
+        class="btn small"
+        onclick="openSleep()">
+
+        Cambiar
+
+      </button>
+
+    </div>
+
+
+    <div>
+
+      <b>
+        ${fmt(data.sleep.start)}
+        →
+        ${fmt(data.sleep.end)}
+      </b>
+
+      <div class="subtitle">
+
+        😴 Horario de descanso configurado
+
+      </div>
+
+    </div>
+
+  </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   HTML ACTIVIDAD
+========================================== */
+
+function activityHTML(a){
+
+  const done =
+    isDone(a,current);
+
+
+  return `
+
+  <div
+    class="activity ${done ? 'done' : ''}">
+
+    <div class="time">
+
+      ${fmt(a.start)}
+
+      <br>
+
+      <span
+        style="color:var(--muted)">
+
+        a ${fmt(a.end)}
+
+      </span>
+
+    </div>
+
+
+    <div>
+
+      <h3>
+
+        ${iconFor(a)}
+        ${esc(a.name)}
+
+      </h3>
+
+
+      <p>
+
+        <span class="cat">
+
+          ${esc(a.category)}
+
+        </span>
+
+
+        ${
+          a.kind === 'recurring'
+          ? ' · 🔁 Recurrente'
+          : ''
+        }
+
+
+        ${
+          a.notes
+          ? ' · ' + esc(a.notes)
+          : ''
+        }
+
+      </p>
+
+    </div>
+
+
+    <div
+      style="display:flex;gap:5px">
+
+      <button
+        class="check ${done ? 'checked' : ''}"
+        onclick='toggleDone(${JSON.stringify(a)})'>
+
+        ${done ? '✓' : ''}
+
+      </button>
+
+
+      <button
+        class="btn small"
+        onclick='editActivity(${JSON.stringify(a)})'>
+
+        ✎
+
+      </button>
+
+    </div>
+
+  </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   NAVEGACIÓN
+========================================== */
+
+function moveDay(n){
+
+  current.setDate(
+    current.getDate() + n
+  );
+
+  render();
+
+}
+
+
+function goToday(){
+
+  current = new Date();
+
+  current.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  render();
+
+}
+
+
+/* ==========================================
+   SEMANA
+========================================== */
+
+function renderWeek(){
+
+  let base =
+    new Date(current);
+
+
+  base.setDate(
+    base.getDate()
+    -
+    base.getDay()
+  );
+
+
+  let cards = '';
+
+
+  for(let i=0;i<7;i++){
+
+    let d =
+      new Date(base);
+
+
+    d.setDate(
+      base.getDate()+i
+    );
+
+
+    let acts =
+      effectiveActivities(d);
+
+
+    let done =
+      acts.filter(
+        a => isDone(a,d)
+      ).length;
+
+
+    let p =
+      acts.length
+      ? Math.round(
+          done / acts.length * 100
+        )
+      : 0;
+
+
+    cards += `
+
+    <div class="card">
+
+      <div class="section-title">
+
+        <h2>
+          ${DAYS[d.getDay()]}
+          ${d.getDate()}/${d.getMonth()+1}
+        </h2>
+
+        <span>
+          ${p}%
+        </span>
+
+      </div>
+
+
+      <div class="progress">
+
+        <div
+          style="width:${p}%">
+        </div>
+
+      </div>
+
+
+      ${
+        acts
+          .slice(0,6)
+          .map(
+            a => `
+
+            <div class="list-row">
+
+              <div>
+
+                <b>
+                  ${iconFor(a)}
+                  ${fmt(a.start)}
+                  ·
+                  ${esc(a.name)}
+                </b>
+
+                <br>
+
+                <small>
+
+                  ${esc(a.category)}
+
+                  ${
+                    a.kind === 'recurring'
+                    ? ' · 🔁'
+                    : ''
+                  }
+
+                </small>
+
+              </div>
+
+
+              <button
+                class="check ${
+                  isDone(a,d)
+                  ? 'checked'
+                  : ''
+                }"
+                onclick='current=new Date("${iso(d)}T00:00:00");toggleDone(${JSON.stringify(a)})'>
+
+                ${
+                  isDone(a,d)
+                  ? '✓'
+                  : ''
+                }
+
+              </button>
+
+            </div>
+
+            `
+          )
+          .join('')
+      }
+
+
+      ${
+        acts.length > 6
+        ? `<small>+ ${acts.length-6} más</small>`
+        : ''
+      }
+
+    </div>
+
+    `;
+
+  }
+
+
+  main.innerHTML = `
+
+  <div class="card">
+
+    <div class="daybar">
+
+      <div>
+
+        <div class="date">
+          📅 Semana
+        </div>
+
+        <div class="subtitle">
+          Consulta y avance de los 7 días.
+        </div>
+
+      </div>
+
+
+      <div class="nav">
+
+        <button
+          class="btn small"
+          onclick="
+            current.setDate(
+              current.getDate()-7
+            );
+            render();
+          ">
+
+          ‹ Semana
+
+        </button>
+
+
+        <button
+          class="btn small"
+          onclick="goToday()">
+
+          Hoy
+
+        </button>
+
+
+        <button
+          class="btn small"
+          onclick="
+            current.setDate(
+              current.getDate()+7
+            );
+            render();
+          ">
+
+          Semana ›
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  ${cards}
+
+  `;
+
+}
+
+
+/* ==========================================
+   RECURRENTES
+========================================== */
+
+function renderRecurring(){
+
+  const rec =
+    data.activities
+      .filter(
+        a =>
+          a.kind === 'recurring'
+      )
+      .sort(sortActs);
+
+
+  main.innerHTML = `
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>
+        🔁 Rutinas recurrentes
+      </h2>
+
+      <button
+        class="btn primary small"
+        onclick="openActivity('recurring')">
+
+        ＋ Nueva
+
+      </button>
+
+    </div>
+
+
+    <div class="notice">
+
+      🔁 Las actividades recurrentes
+      aparecen automáticamente en los
+      días seleccionados.
+
+      <br><br>
+
+      Puedes completar una actividad
+      en un día sin eliminar la rutina.
+
+    </div>
+
+
+    ${
+      rec.length
+
+      ?
+
+      rec.map(
+        a => `
+
+        <div class="list-row">
+
+          <div>
+
+            <b>
+
+              ${iconFor(a)}
+              ${fmt(a.start)}
+              –
+              ${fmt(a.end)}
+              ·
+              ${esc(a.name)}
+
+            </b>
+
+            <br>
+
+            <small>
+
+              ${esc(a.category)}
+
+              ·
+
+              ${a.days
+                .map(x => DAYSHORT[x])
+                .join(' · ')}
+
+            </small>
+
+          </div>
+
+
+          <div
+            style="display:flex;gap:5px">
+
+            <button
+              class="btn small"
+              onclick='editActivity(${JSON.stringify(a)})'>
+
+              ✎
+
+            </button>
+
+
+            <button
+              class="btn small"
+              onclick="deleteActivity('${a.id}')">
+
+              🗑️
+
+            </button>
+
+          </div>
+
+        </div>
+
+        `
+      ).join('')
+
+      :
+
+      `
+
+      <div class="empty">
+
+        🔁
+
+        <br><br>
+
+        Todavía no tienes
+        rutinas recurrentes.
+
+      </div>
+
+      `
+    }
+
+  </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   CONFIGURACIÓN
+========================================== */
+
+function renderSettings(){
+
+  main.innerHTML = `
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>
+        ⚙️ Configuración
+      </h2>
+
+    </div>
+
+
+    <div class="section-title">
+
+      <div>
+
+        <b>
+          🗂️ Categorías
+        </b>
+
+        <div class="subtitle">
+
+          Úsalas para organizar
+          visualmente tus actividades.
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="btn small primary"
+        onclick="addCategory()">
+
+        ＋
+
+      </button>
+
+    </div>
+
+
+    ${
+      data.categories.map(
+        (c,i) => `
+
+        <div class="list-row">
+
+          <span>
+            ✨ ${esc(c)}
+          </span>
+
+          <button
+            class="btn small"
+            onclick="renameCategory(${i})">
+
+            ✎
+
+          </button>
+
+        </div>
+
+        `
+      ).join('')
+    }
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>
+        📤 Compartir y respaldo
+      </h2>
+
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        class="btn primary"
+        onclick="shareWhatsApp()">
+
+        💬 WhatsApp
+
+      </button>
+
+
+      <button
+        class="btn"
+        onclick="exportExcel()">
+
+        📊 Excel
+
+      </button>
+
+
+      <button
+        class="btn"
+        onclick="exportJSON()">
+
+        💾 Respaldo
+
+      </button>
+
+
+      <button
+        class="btn"
+        onclick="importJSON()">
+
+        📥 Restaurar
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>
+        🌙 Sueño
+      </h2>
+
+      <button
+        class="btn small"
+        onclick="openSleep()">
+
+        Editar
+
+      </button>
+
+    </div>
+
+
+    <b>
+
+      ${fmt(data.sleep.start)}
+      →
+      ${fmt(data.sleep.end)}
+
+    </b>
+
+  </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   FORMULARIO
+========================================== */
+
+function populateCategories(){
+
+  category.innerHTML =
+    data.categories
+      .map(
+        c =>
+          `<option>${esc(c)}</option>`
+      )
+      .join('');
+
+}
+
+
+const dayChoices =
+  document.getElementById(
+    'dayChoices'
+  );
+
+
+function buildDays(selected=[]){
+
+  dayChoices.innerHTML =
+    DAYS.map(
+      (d,i) => `
+
+      <button
+        type="button"
+        class="day-chip ${
+          selected.includes(i)
+          ? 'active'
+          : ''
+        }"
+        data-day="${i}"
+        onclick="
+          this.classList.toggle('active')
+        ">
+
+        ${DAYSHORT[i]}
+        ${d.slice(0,3)}
+
+      </button>
+
+      `
+    ).join('');
+
+}
+
+
+type.onchange = () => {
+
+  recurrenceFields.style.display =
+    type.value === 'recurring'
+      ? 'block'
+      : 'none';
+
+};
+
+
+/* ==========================================
+   NUEVA ACTIVIDAD
+========================================== */
+
+function openActivity(forceType){
+
+  activityForm.reset();
+
+  editId.value = '';
+
+  modalTitle.textContent =
+    'Nueva actividad';
+
+
+  populateCategories();
+
+
+  type.value =
+    forceType || 'specific';
+
+
+  recurrenceFields.style.display =
+    type.value === 'recurring'
+      ? 'block'
+      : 'none';
+
+
+  const now =
+    new Date();
+
+
+  const h =
+    String(
+      now.getHours()
+    ).padStart(2,'0');
+
+
+  const m =
+    String(
+      Math.ceil(
+        now.getMinutes()/5
+      )*5 % 60
+    ).padStart(2,'0');
+
+
+  start.value =
+    `${h}:${m}`;
+
+
+  let e =
+    new Date(
+      now.getTime()
+      +
+      30*60000
+    );
+
+
+  end.value =
+    `${String(
+      e.getHours()
+    ).padStart(2,'0')}:${String(
+      e.getMinutes()
+    ).padStart(2,'0')}`;
+
+
+  buildDays([
+    current.getDay()
+  ]);
+
+
+  modal.classList.add('show');
+
+}
+
+
+/* ==========================================
+   EDITAR ACTIVIDAD
+========================================== */
+
+function editActivity(a){
+
+  populateCategories();
+
+  activityForm.reset();
+
+
+  editId.value =
+    a.virtual
+      ? a.sourceId
+      : a.id;
+
+
+  modalTitle.textContent =
+    'Editar actividad';
+
+
+  name.value =
+    a.name;
+
+
+  start.value =
+    a.start;
+
+
+  end.value =
+    a.end;
+
+
+  category.value =
+    a.category;
+
+
+  notes.value =
+    a.notes || '';
+
+
+  type.value =
+    a.kind;
+
+
+  recurrenceFields.style.display =
+    a.kind === 'recurring'
+      ? 'block'
+      : 'none';
+
+
+  buildDays(
+    a.days || [
+      current.getDay()
+    ]
+  );
+
+
+  modal.classList.add('show');
+
+}
+
+
+/* ==========================================
+   GUARDAR ACTIVIDAD
+========================================== */
+
+function saveActivity(e){
+
+  e.preventDefault();
+
+
+  const id =
+    editId.value || uid();
+
+
+  const kind =
+    type.value;
+
+
+  let old =
+    data.activities.find(
+      a => a.id === id
+    );
+
+
+  const obj = {
+
+    id,
+
+    name:
+      name.value.trim(),
+
+    start:
+      start.value,
+
+    end:
+      end.value,
+
+    category:
+      category.value,
+
+    notes:
+      notes.value.trim(),
+
+    kind,
+
+    days:
+      kind === 'recurring'
+      ?
+
+      [
+        ...dayChoices
+          .querySelectorAll('.active')
+      ]
+      .map(
+        x =>
+          +x.dataset.day
+      )
+
+      :
+
+      [],
+
+    date:
+      kind === 'specific'
+      ? iso(current)
+      : null,
+
+    done:
+      old?.done || {}
+
+  };
+
+
+  if(
+    kind === 'recurring'
+    &&
+    !obj.days.length
+  ){
+
+    alert(
+      'Selecciona al menos un día.'
+    );
+
+    return;
+
+  }
+
+
+  const idx =
+    data.activities.findIndex(
+      a => a.id === id
+    );
+
+
+  if(idx >= 0)
+
+    data.activities[idx] =
+      obj;
+
+  else
+
+    data.activities.push(obj);
+
+
+  save();
+
+  closeModal();
+
+  render();
+
+}
+
+
+/* ==========================================
+   ELIMINAR
+========================================== */
+
+function deleteActivity(id){
+
+  if(
+    confirm(
+      '¿Eliminar esta actividad?'
+    )
+  ){
+
+    data.activities =
+      data.activities.filter(
+        a => a.id !== id
+      );
+
+
+    save();
+
+    render();
+
+  }
+
+}
+
+
+function closeModal(){
+
+  modal.classList.remove(
+    'show'
+  );
+
+}
+
+
+/* ==========================================
+   SUEÑO
+========================================== */
+
+function openSleep(){
+
+  sleepStart.value =
+    data.sleep.start;
+
+
+  sleepEnd.value =
+    data.sleep.end;
+
+
+  sleepModal.classList.add(
+    'show'
+  );
+
+}
+
+
+function closeSleep(){
+
+  sleepModal.classList.remove(
+    'show'
+  );
+
+}
+
+
+function saveSleep(){
+
+  if(
+    !sleepStart.value
+    ||
+    !sleepEnd.value
+  )
+    return;
+
+
+  data.sleep = {
+
+    start:
+      sleepStart.value,
+
+    end:
+      sleepEnd.value
+
+  };
+
+
+  save();
+
+  closeSleep();
+
+  render();
+
+}
+
+
+/* ==========================================
+   CATEGORÍAS
+========================================== */
+
+function addCategory(){
+
+  let x =
+    prompt(
+      'Nombre de la nueva categoría:'
+    );
+
+
+  if(
+    x &&
+    x.trim()
+  ){
+
+    data.categories.push(
+      x.trim()
+    );
+
+
+    save();
+
+    render();
+
+  }
+
+}
+
+
+function renameCategory(i){
+
+  let x =
+    prompt(
+      'Nuevo nombre:',
+      data.categories[i]
+    );
+
+
+  if(
+    x &&
+    x.trim()
+  ){
+
+    let old =
+      data.categories[i];
+
+
+    data.categories[i] =
+      x.trim();
+
+
+    data.activities
+      .forEach(
+        a => {
+
+          if(
+            a.category === old
+          )
+
+            a.category =
+              x.trim();
+
+        }
+      );
+
+
+    save();
+
+    render();
+
+  }
+
+}
+
+
+/* ==========================================
+   MODO OSCURO
+========================================== */
+
+function toggleDark(){
+
+  data.theme =
+    data.theme === 'dark'
+      ? 'light'
+      : 'dark';
+
+
+  document.body
+    .classList.toggle(
+      'dark',
+      data.theme === 'dark'
+    );
+
+
+  save();
+
+}
+
+
+/* ==========================================
+   WHATSAPP
+========================================== */
+
+function shareWhatsApp(){
+
+  const acts =
+    effectiveActivities(current);
+
+
+  const done =
+    acts.filter(
+      a =>
+        isDone(a,current)
+    ).length;
+
+
+  const p =
+    acts.length
+      ? Math.round(
+          done / acts.length * 100
+        )
+      : 0;
+
+
+  let t =
+    `*Mi Rutina Diaria*%0A`
+    +
+    `${encodeURIComponent(
+      dateLabel(current)
+    )}%0A%0A`;
+
+
+  acts.forEach(
+    a => {
+
+      t +=
+
+        `${
+          isDone(a,current)
+          ? '✅'
+          : '⬜'
+        } `
+
+        +
+
+        `${encodeURIComponent(
+          fmt(a.start)
+          +
+          '–'
+          +
+          fmt(a.end)
+          +
+          ' · '
+          +
+          a.name
+          +
+          ' ('
+          +
+          a.category
+          +
+          ')'
+        )}`
+
+        +
+
+        `%0A`;
+
+    }
+  );
+
+
+  t +=
+
+    `%0A📊 Avance: ${p}%`;
+
+
+  window.open(
+    'https://wa.me/?text=' + t,
+    '_blank'
+  );
+
+}
+
+
+/* ==========================================
+   RESPALDO JSON
+========================================== */
+
+function exportJSON(){
+
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          data,
+          null,
+          2
+        )
+      ],
+      {
+        type:'application/json'
+      }
+    );
+
+
+  const a =
+    document.createElement('a');
+
+
+  a.href =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  a.download =
+    'mi_rutina_respaldo.json';
+
+
+  a.click();
+
+
+  URL.revokeObjectURL(
+    a.href
+  );
+
+}
+
+
+/* ==========================================
+   IMPORTAR RESPALDO
+========================================== */
+
+function importJSON(){
+
+  const i =
+    document.createElement(
+      'input'
+    );
+
+
+  i.type = 'file';
+
+  i.accept = '.json';
+
+
+  i.onchange = () => {
+
+    let f =
+      i.files[0];
+
+
+    if(!f)
+      return;
+
+
+    let r =
+      new FileReader();
+
+
+    r.onload = () => {
+
+      try{
+
+        data =
+          JSON.parse(
+            r.result
+          );
+
+
+        save();
+
+        location.reload();
+
+      }
+
+      catch{
+
+        alert(
+          'El archivo no es válido.'
+        );
+
+      }
+
+    };
+
+
+    r.readAsText(f);
+
+  };
+
+
+  i.click();
+
+}
+
+
+/* ==========================================
+   EXPORTAR EXCEL / CSV
+========================================== */
+
+function exportExcel(){
+
+  const rows = [
+
+    [
+      'Fecha',
+      'Día',
+      'Inicio',
+      'Fin',
+      'Actividad',
+      'Categoría',
+      'Tipo',
+      'Completada',
+      'Notas'
+    ]
+
+  ];
+
+
+  const startD =
+    new Date(current);
+
+
+  startD.setDate(
+    startD.getDate()
+    -
+    startD.getDay()
+  );
+
+
+  for(
+    let i=0;
+    i<7;
+    i++
+  ){
+
+    let d =
+      new Date(startD);
+
+
+    d.setDate(
+      startD.getDate()+i
+    );
+
+
+    effectiveActivities(d)
+      .forEach(
+        a => {
+
+          rows.push([
+
+            iso(d),
+
+            DAYS[
+              d.getDay()
+            ],
+
+            a.start,
+
+            a.end,
+
+            a.name,
+
+            a.category,
+
+            a.kind === 'recurring'
+              ? 'Recurrente'
+              : 'Específica',
+
+            isDone(a,d)
+              ? 'Sí'
+              : 'No',
+
+            a.notes || ''
+
+          ]);
+
+        }
+      );
+
+  }
+
+
+  const csv =
+    rows
+      .map(
+        r =>
+          r
+            .map(
+              v =>
+                `"${String(v)
+                  .replace(/"/g,'""')}"`
+            )
+            .join(',')
+      )
+      .join('\r\n');
+
+
+  const blob =
+    new Blob(
+      [
+        '\ufeff' + csv
+      ],
+      {
+        type:
+          'text/csv;charset=utf-8'
+      }
+    );
+
+
+  const a =
+    document.createElement('a');
+
+
+  a.href =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  a.download =
+    'Mi_Rutina_Diaria.csv';
+
+
+  a.click();
+
+
+  URL.revokeObjectURL(
+    a.href
+  );
+
+}
+
+
+/* ==========================================
+   INICIALIZACIÓN
+========================================== */
+
+document.body
+  .classList.toggle(
+    'dark',
+    data.theme === 'dark'
+  );
+
+
+render();
+
+</script>
+
+</body>
+</html>
