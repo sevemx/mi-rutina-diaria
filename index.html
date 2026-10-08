@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Rutina Diaria</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --success: #10B981;
+            --dark: #1F2937;
+            --light: #F3F4F6;
+            --night: #111827;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light);
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        /* Pestañas de días */
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background: var(--primary);
+            color: white;
+        }
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+        .tab.active {
+            opacity: 1;
+            font-weight: bold;
+            border-bottom: 4px solid white;
+        }
+        /* Barra de progreso */
+        .progress-container {
+            padding: 15px 20px 0 20px;
+        }
+        .progress-bar-bg {
+            background: #E5E7EB;
+            border-radius: 8px;
+            height: 12px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: var(--success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            text-align: right;
+            font-size: 0.85em;
+            color: #6B7280;
+            margin-top: 5px;
+        }
+        /* Descanso Nocturno */
+        .sleep-panel {
+            background: var(--night);
+            color: white;
+            margin: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sleep-panel input {
+            background: transparent;
+            border: 1px solid #4B5563;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        /* Controles y Botones */
+        .controls {
+            padding: 0 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        button.action-btn { background: #E5E7EB; color: var(--dark); }
+        button.success-btn { background: var(--success); }
+        button.ios-btn { background: #000; color: #fff; }
+        /* Lista de actividades */
+        .activity-list {
+            padding: 20px;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            background: var(--light);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        .activity-item.done {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        .time-badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            min-width: 90px;
+            text-align: center;
+        }
+        .activity-name { flex-grow: 1; }
+        .delete-btn { background: #EF4444; padding: 4px 8px; }
+        
+        /* Formulario nueva actividad */
+        .add-form {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+        .add-form input, .add-form select {
+            padding: 8px;
+            border: 1px solid #D1D5DB;
+            border-radius: 4px;
+        }
+        .add-form input { flex-grow: 1; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="tabs" id="tabs"></div>
+    
+    <div class="progress-container">
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0% Completado</div>
+    </div>
+
+    <div class="sleep-panel">
+        <div>
+            <label>🌙 Dormir:</label><br>
+            <input type="time" id="sleepTime" onchange="updateSleep()">
+        </div>
+        <div>
+            <label>☀️ Despertar:</label><br>
+            <input type="time" id="wakeTime" onchange="updateSleep()">
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="action-btn" onclick="copyDayPrompt()">📋 Copiar a otro día</button>
+        <button class="success-btn" onclick="exportCSV()">📊 Excel</button>
+        <button class="success-btn" onclick="shareWhatsApp()">💬 WhatsApp</button>
+        <button class="ios-btn" onclick="exportAppleCalendar()">📱 Agenda iPhone</button>
+    </div>
+
+    <div class="activity-list" id="activityList"></div>
+
+    <div class="add-form">
+        <input type="text" id="newActivityName" placeholder="¿Qué harás? (Ej. Lavar trastes)">
+        <select id="newActivityDuration">
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60">1 hora</option>
+            <option value="90">1.5 horas</option>
+            <option value="120">2 horas</option>
+            <option value="180">3 horas</option>
+            <option value="240">4 horas</option>
+        </select>
+        <button onclick="addActivity()">Añadir</button>
+    </div>
+</div>
+
+<script>
+    const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    let currentDay = 'Lunes';
+    
+    // Inicializar datos o cargar de LocalStorage (simulando nube/persistencia)
+    let appData = JSON.parse(localStorage.getItem('rutinaData')) || {};
+    dias.forEach(d => {
+        if (!appData[d]) appData[d] = { wake: '07:00', sleep: '22:00', activities: [] };
+    });
+
+    function saveData() {
+        localStorage.setItem('rutinaData', JSON.stringify(appData));
+        renderApp();
+    }
+
+    function renderApp() {
+        renderTabs();
+        document.getElementById('wakeTime').value = appData[currentDay].wake;
+        document.getElementById('sleepTime').value = appData[currentDay].sleep;
+        renderActivities();
+        updateProgress();
+    }
+
+    function renderTabs() {
+        const tabsDiv = document.getElementById('tabs');
+        tabsDiv.innerHTML = dias.map(d => 
+            `<div class="tab ${d === currentDay ? 'active' : ''}" onclick="changeDay('${d}')">${d}</div>`
+        ).join('');
+    }
+
+    function changeDay(day) {
+        currentDay = day;
+        renderApp();
+    }
+
+    function updateSleep() {
+        appData[currentDay].wake = document.getElementById('wakeTime').value;
+        appData[currentDay].sleep = document.getElementById('sleepTime').value;
+        saveData();
+    }
+
+    function renderActivities() {
+        const list = document.getElementById('activityList');
+        let currentMins = timeToMins(appData[currentDay].wake);
+        
+        list.innerHTML = '';
+        appData[currentDay].activities.forEach((act, index) => {
+            let start = minsToTime(currentMins);
+            let endMins = currentMins + parseInt(act.duration);
+            let end = minsToTime(endMins);
+            
+            list.innerHTML += `
+                <div class="activity-item ${act.done ? 'done' : ''}">
+                    <input type="checkbox" ${act.done ? 'checked' : ''} onchange="toggleDone(${index})">
+                    <div class="time-badge">${start} - ${end}</div>
+                    <div class="activity-name">${act.name}</div>
+                    <button class="delete-btn" onclick="deleteActivity(${index})">X</button>
+                </div>
+            `;
+            currentMins = endMins;
+        });
+    }
+
+    function addActivity() {
+        const name = document.getElementById('newActivityName').value;
+        const duration = document.getElementById('newActivityDuration').value;
+        if (!name) return alert("Escribe una actividad");
+        
+        appData[currentDay].activities.push({ name, duration: parseInt(duration), done: false });
+        document.getElementById('newActivityName').value = '';
+        saveData();
+    }
+
+    function deleteActivity(index) {
+        appData[currentDay].activities.splice(index, 1);
+        saveData();
+    }
+
+    function toggleDone(index) {
+        appData[currentDay].activities[index].done = !appData[currentDay].activities[index].done;
+        saveData();
+    }
+
+    function updateProgress() {
+        const acts = appData[currentDay].activities;
+        if (acts.length === 0) {
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressText').innerText = '0% Completado';
+            return;
+        }
+        const doneCount = acts.filter(a => a.done).length;
+        const percent = Math.round((doneCount / acts.length) * 100);
+        document.getElementById('progressBar').style.width = percent + '%';
+        document.getElementById('progressText').innerText = percent + '% Completado';
+    }
+
+    function copyDayPrompt() {
+        const targetDay = prompt(`¿A qué día quieres copiar la rutina del ${currentDay}? (Escribe: Lunes, Martes, etc.)`);
+        if (targetDay && dias.includes(targetDay)) {
+            // Copia profunda reseteando los "done"
+            appData[targetDay] = JSON.parse(JSON.stringify(appData[currentDay]));
+            appData[targetDay].activities.forEach(a => a.done = false);
+            saveData();
+            alert(`¡Rutina copiada al ${targetDay} con éxito!`);
+        } else if (targetDay) {
+            alert("Día no válido.");
+        }
+    }
+
+    // Funciones de formato de tiempo
+    function timeToMins(timeStr) {
+        const [h, m] = timeStr.split(':').map(Number);
+        return (h * 60) + m;
+    }
+    function minsToTime(mins) {
+        const h = Math.floor(mins / 60) % 24;
+        const m = mins % 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function getScheduleData() {
+        let text = `*Rutina del ${currentDay}*\n`;
+        text += `☀️ Despertar: ${appData[currentDay].wake}\n`;
+        let currentMins = timeToMins(appData[currentDay].wake);
+        
+        let rows = [];
+        appData[currentDay].activities.forEach(act => {
+            let start = minsToTime(currentMins);
+            let endMins = currentMins + act.duration;
+            let end = minsToTime(endMins);
+            let check = act.done ? '✅' : '⏳';
+            
+            text += `${check} ${start} - ${end}: ${act.name}\n`;
+            rows.push([currentDay, start, end, act.name, act.done ? 'Completado' : 'Pendiente']);
+            
+            currentMins = endMins;
+        });
+        text += `🌙 Dormir: ${appData[currentDay].sleep}\n`;
+        return { text, rows };
+    }
+
+    function exportCSV() {
+        const { rows } = getScheduleData();
+        let csvContent = "data:text/csv;charset=utf-8,Dia,Inicio,Fin,Actividad,Estado\n";
+        rows.forEach(row => {
+            csvContent += row.join(",") + "\n";
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Rutina_${currentDay}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function shareWhatsApp() {
+        const { text } = getScheduleData();
+        const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    }
+
+    // EXPORTAR A CALENDARIO IPHONE (ICS)
+    function exportAppleCalendar() {
+        const acts = appData[currentDay].activities;
+        if (acts.length === 0) return alert("Añade actividades primero.");
+
+        let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Mi Rutina Diaria//ES\nCALSCALE:GREGORIAN\n";
+        
+        // Calcular la fecha del próximo día seleccionado
+        const daysMap = { 'Domingo':0, 'Lunes':1, 'Martes':2, 'Miércoles':3, 'Jueves':4, 'Viernes':5, 'Sábado':6 };
+        let targetIdx = daysMap[currentDay];
+        let d = new Date();
+        let currentIdx = d.getDay();
+        let diff = targetIdx - currentIdx;
+        if (diff < 0) diff += 7; 
+        d.setDate(d.getDate() + diff);
+        const dateStr = d.toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD
+
+        let currentMins = timeToMins(appData[currentDay].wake);
+
+        acts.forEach(act => {
+            let startH = String(Math.floor(currentMins / 60) % 24).padStart(2, '0');
+            let startM = String(currentMins % 60).padStart(2, '0');
+            
+            let endMins = currentMins + act.duration;
+            let endH = String(Math.floor(endMins / 60) % 24).padStart(2, '0');
+            let endM = String(endMins % 60).padStart(2, '0');
+
+            icsContent += "BEGIN:VEVENT\n";
+            icsContent += `SUMMARY:${act.name}\n`;
+            icsContent += `DTSTART:${dateStr}T${startH}${startM}00\n`;
+            icsContent += `DTEND:${dateStr}T${endH}${endM}00\n`;
+            icsContent += "DESCRIPTION:Recordatorio de Mi Rutina Diaria\n";
+            // Alarma 15 min antes (para iPhone/iOS)
+            icsContent += "BEGIN:VALARM\nTRIGGER:-PT15M\nACTION:DISPLAY\nDESCRIPTION:Recordatorio de rutina\nEND:VALARM\n";
+            icsContent += "END:VEVENT\n";
+
+            currentMins = endMins;
+        });
+
+        // Evento de sueño
+        let sleepArr = appData[currentDay].sleep.split(':');
+        icsContent += "BEGIN:VEVENT\n";
+        icsContent += `SUMMARY:Hora de Dormir (Descanso Nocturno)\n`;
+        icsContent += `DTSTART:${dateStr}T${sleepArr[0]}${sleepArr[1]}00\n`;
+        icsContent += `DTEND:${dateStr}T235900\n`;
+        icsContent += "BEGIN:VALARM\nTRIGGER:-PT30M\nACTION:DISPLAY\nDESCRIPTION:Prepararse para dormir\nEND:VALARM\n";
+        icsContent += "END:VEVENT\n";
+
+        icsContent += "END:VCALENDAR";
+
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute('download', `Agenda_${currentDay}.ics`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    renderApp(); // Iniciar app
+</script>
+</body>
+</html>
