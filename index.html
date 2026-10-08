@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Rutina Diaria</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --night-bg: #1E1B4B;
+            --night-text: #E0E7FF;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+        }
+
+        /* Barra de Progreso */
+        .progress-container {
+            background-color: #E5E7EB;
+            border-radius: 10px;
+            height: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            background-color: #10B981;
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 2px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1F2937;
+        }
+
+        /* Pestañas */
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 5px;
+            margin-bottom: 20px;
+            padding-bottom: 5px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            background: #E5E7EB;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Tarjeta Nocturna */
+        .night-card {
+            background-color: var(--night-bg);
+            color: var(--night-text);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .night-card input[type="time"] {
+            background: #312E81;
+            border: 1px solid #4338CA;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* Lista de Actividades */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .activity-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .activity-card.completed {
+            opacity: 0.6;
+        }
+        
+        .activity-card.completed .activity-title {
+            text-decoration: line-through;
+        }
+
+        .time-badge {
+            background: #EEF2FF;
+            color: var(--primary);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .activity-info {
+            flex-grow: 1;
+        }
+
+        .activity-title {
+            font-weight: bold;
+            margin: 0 0 5px 0;
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .activity-title:focus {
+            outline: none;
+            border-bottom: 1px solid var(--primary);
+        }
+
+        select, button {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #D1D5DB;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn:hover { background: var(--primary-hover); }
+        .btn-danger { background: #EF4444; }
+        .btn-danger:hover { background: #DC2626; }
+        .btn-success { background: #10B981; }
+        
+        .actions-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .checkbox-custom {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Mi Rutina Diaria</h1>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-text" id="progressText">0% Completado</div>
+    </div>
+
+    <div class="tabs" id="dayTabs">
+        <!-- Generado por JS -->
+    </div>
+
+    <div class="night-card">
+        <div>
+            <h3 style="margin:0 0 10px 0;">🌙 Descanso Nocturno</h3>
+            <label>Dormir: <input type="time" id="sleepTime" onchange="saveData()"></label>
+        </div>
+        <div>
+            <label>Despertar: <input type="time" id="wakeTime" onchange="saveData()"></label>
+        </div>
+    </div>
+
+    <div class="activity-list" id="activityList">
+        <!-- Actividades inyectadas por JS -->
+    </div>
+
+    <div class="actions-bar">
+        <button class="btn" onclick="addActivity()">+ Nueva Tarea</button>
+        <button class="btn" style="background:#6366F1;" onclick="promptCopyDay()">📋 Copiar a otro día</button>
+    </div>
+    
+    <hr style="border: 1px solid #E5E7EB; margin: 20px 0;">
+
+    <div class="actions-bar">
+        <button class="btn btn-success" onclick="exportToExcel()">📊 Exportar Excel</button>
+        <button class="btn" style="background: #25D366;" onclick="shareWhatsApp()">💬 WhatsApp</button>
+        <button class="btn" style="background: #000000;" onclick="exportToCalendar()">📅 Exportar a Calendario</button>
+    </div>
+</div>
+
+<script>
+    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    let currentDay = 0;
+    
+    // Estructura de datos
+    let routineData = JSON.parse(localStorage.getItem('miRutinaData')) || {};
+
+    // Inicializar datos si están vacíos
+    days.forEach((day, index) => {
+        if (!routineData[index]) {
+            routineData[index] = {
+                sleepTime: '22:00',
+                wakeTime: '07:00',
+                activities: []
+            };
+        }
+    });
+
+    // Duraciones en minutos para el selector
+    const durations = [
+        { label: '15 min', val: 15 },
+        { label: '30 min', val: 30 },
+        { label: '45 min', val: 45 },
+        { label: '1 hora', val: 60 },
+        { label: '1.5 horas', val: 90 },
+        { label: '2 horas', val: 120 },
+        { label: '3 horas', val: 180 },
+        { label: '4 horas', val: 240 }
+    ];
+
+    function init() {
+        renderTabs();
+        loadDay(currentDay);
+    }
+
+    function renderTabs() {
+        const tabsContainer = document.getElementById('dayTabs');
+        tabsContainer.innerHTML = days.map((day, index) => `
+            <button class="tab ${index === currentDay ? 'active' : ''}" onclick="loadDay(${index})">${day}</button>
+        `).join('');
+    }
+
+    function loadDay(index) {
+        currentDay = index;
+        renderTabs();
+        
+        const dayData = routineData[currentDay];
+        document.getElementById('sleepTime').value = dayData.sleepTime;
+        document.getElementById('wakeTime').value = dayData.wakeTime;
+        
+        renderActivities();
+    }
+
+    function formatTime(dateObj) {
+        return dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function renderActivities() {
+        const list = document.getElementById('activityList');
+        const dayData = routineData[currentDay];
+        
+        let [wakeHour, wakeMin] = dayData.wakeTime.split(':').map(Number);
+        let currentTime = new Date();
+        currentTime.setHours(wakeHour, wakeMin, 0);
+
+        list.innerHTML = '';
+        let completedCount = 0;
+
+        dayData.activities.forEach((act, idx) => {
+            if (act.completed) completedCount++;
+
+            let startTime = formatTime(currentTime);
+            currentTime.setMinutes(currentTime.getMinutes() + act.duration);
+            let endTime = formatTime(currentTime);
+
+            // Guardamos la hora calculada para exportaciones
+            act.computedStart = startTime;
+            act.computedEnd = endTime;
+
+            const durationOptions = durations.map(d => 
+                `<option value="${d.val}" ${act.duration === d.val ? 'selected' : ''}>${d.label}</option>`
+            ).join('');
+
+            list.innerHTML += `
+                <div class="activity-card ${act.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="checkbox-custom" ${act.completed ? 'checked' : ''} onchange="toggleComplete(${idx})">
+                    <div class="time-badge">${startTime} - ${endTime}</div>
+                    <div class="activity-info">
+                        <input type="text" class="activity-title" value="${act.name}" onchange="updateActivityName(${idx}, this.value)" placeholder="Nombre de actividad...">
+                        <select onchange="updateDuration(${idx}, this.value)">
+                            ${durationOptions}
+                        </select>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteActivity(${idx})">X</button>
+                </div>
+            `;
+        });
+
+        updateProgress(completedCount, dayData.activities.length);
+    }
+
+    function updateProgress(completed, total) {
+        const bar = document.getElementById('progressBar');
+        const text = document.getElementById('progressText');
+        if (total === 0) {
+            bar.style.width = '0%';
+            text.innerText = '0% Completado';
+            return;
+        }
+        const percentage = Math.round((completed / total) * 100);
+        bar.style.width = percentage + '%';
+        text.innerText = percentage + '% Completado';
+    }
+
+    function addActivity() {
+        routineData[currentDay].activities.push({
+            name: 'Nueva Actividad',
+            duration: 30,
+            completed: false
+        });
+        saveData();
+    }
+
+    function updateActivityName(index, newName) {
+        routineData[currentDay].activities[index].name = newName;
+        saveData();
+    }
+
+    function updateDuration(index, newDuration) {
+        routineData[currentDay].activities[index].duration = parseInt(newDuration);
+        saveData();
+    }
+
+    function toggleComplete(index) {
+        routineData[currentDay].activities[index].completed = !routineData[currentDay].activities[index].completed;
+        saveData();
+    }
+
+    function deleteActivity(index) {
+        routineData[currentDay].activities.splice(index, 1);
+        saveData();
+    }
+
+    function saveData() {
+        routineData[currentDay].sleepTime = document.getElementById('sleepTime').value;
+        routineData[currentDay].wakeTime = document.getElementById('wakeTime').value;
+        localStorage.setItem('miRutinaData', JSON.stringify(routineData));
+        renderActivities(); // Re-renderiza para ajustar los horarios en cascada
+    }
+
+    function promptCopyDay() {
+        let targetDayName = prompt("¿A qué día quieres copiar esta rutina? (Escribe: Lunes, Martes, Miercoles, Jueves, Viernes, Sabado o Domingo)");
+        if (!targetDayName) return;
+        
+        // Normalizar texto
+        targetDayName = targetDayName.toLowerCase().replace('é', 'e').replace('á', 'a').replace('í', 'i').replace('ó', 'o').replace('ú', 'u');
+        
+        const daysNormal = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+        const targetIndex = daysNormal.indexOf(targetDayName);
+        
+        if (targetIndex !== -1) {
+            // Clonamos el objeto profundamente
+            let clonedData = JSON.parse(JSON.stringify(routineData[currentDay]));
+            // Reiniciamos las tareas a "no completadas"
+            clonedData.activities.forEach(a => a.completed = false);
+            
+            routineData[targetIndex] = clonedData;
+            localStorage.setItem('miRutinaData', JSON.stringify(routineData));
+            alert(`¡Rutina copiada con éxito a ${days[targetIndex]}!`);
+            if (targetIndex === currentDay) renderActivities();
+        } else {
+            alert("Día no reconocido. Intenta de nuevo.");
+        }
+    }
+
+    // Exportar a Calendario (.ics) para iPhone/Android
+    function exportToCalendar() {
+        const dayData = routineData[currentDay];
+        if (dayData.activities.length === 0) {
+            alert("No hay actividades para exportar.");
+            return;
+        }
+
+        // Obtener la fecha del día seleccionado en la semana actual
+        const today = new Date();
+        const currentDayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1; // 0=Lunes, 6=Domingo
+        const daysDifference = currentDay - currentDayOfWeek;
+        
+        let targetDate = new Date(today);
+        targetDate.setDate(today.getDate() + daysDifference);
+
+        let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Mi Rutina Diaria//ES\nCALSCALE:GREGORIAN\n";
+
+        dayData.activities.forEach(act => {
+            let [startH, startM] = act.computedStart.split(':');
+            let [endH, endM] = act.computedEnd.split(':');
+
+            let startDate = new Date(targetDate);
+            startDate.setHours(startH, startM, 0);
+            
+            let endDate = new Date(targetDate);
+            endDate.setHours(endH, endM, 0);
+
+            // Formato de fecha para iCal: YYYYMMDDTHHMMSSZ (en UTC)
+            let startICS = startDate.toISOString().replace(/[-:]/g, '').split('.')[0] + "Z";
+            let endICS = endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + "Z";
+
+            icsContent += "BEGIN:VEVENT\n";
+            icsContent += `SUMMARY:${act.name}\n`;
+            icsContent += `DTSTART:${startICS}\n`;
+            icsContent += `DTEND:${endICS}\n`;
+            icsContent += `DESCRIPTION:Generado por Mi Rutina Diaria\n`;
+            
+            // Configurar alarma 10 minutos antes (compatible con iPhone)
+            icsContent += "BEGIN:VALARM\n";
+            icsContent += "TRIGGER:-PT10M\n";
+            icsContent += "ACTION:DISPLAY\n";
+            icsContent += `DESCRIPTION:Recordatorio de rutina: ${act.name}\n`;
+            icsContent += "END:VALARM\n";
+            
+            icsContent += "END:VEVENT\n";
+        });
+
+        icsContent += "END:VCALENDAR";
+
+        // Crear archivo y forzar descarga
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Rutina_${days[currentDay]}.ics`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function exportToExcel() {
+        let csvContent = "data:text/csv;charset=utf-8,Día,Inicio,Fin,Actividad,Estado\n";
+        
+        const dayData = routineData[currentDay];
+        dayData.activities.forEach(act => {
+            let estado = act.completed ? "Completado" : "Pendiente";
+            csvContent += `${days[currentDay]},${act.computedStart},${act.computedEnd},"${act.name}",${estado}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Rutina_${days[currentDay]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function shareWhatsApp() {
+        const dayData = routineData[currentDay];
+        let text = `📅 *Mi Rutina del ${days[currentDay]}*\n\n`;
+        
+        text += `🌅 Despertar: ${dayData.wakeTime}\n`;
+        
+        dayData.activities.forEach(act => {
+            let check = act.completed ? "✅" : "🕒";
+            text += `${check} ${act.computedStart} - ${act.computedEnd}: ${act.name}\n`;
+        });
+        
+        text += `\n🌙 Dormir: ${dayData.sleepTime}\n`;
+
+        const encodedText = encodeURIComponent(text);
+        window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
