@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Rutina Diaria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-md z-10">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-calendar-day"></i> Mi Rutina Diaria
+            </h1>
+            <div class="flex gap-3">
+                <button id="btnExport" class="bg-indigo-500 hover:bg-indigo-400 p-2 rounded-lg transition-colors flex items-center justify-center" title="Exportar a Excel (CSV)">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span class="hidden md:inline ml-2 text-sm font-medium">Exportar</span>
+                </button>
+                <button id="btnShareWA" class="bg-green-500 hover:bg-green-400 p-2 rounded-lg transition-colors flex items-center justify-center" title="Compartir en WhatsApp">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span class="hidden md:inline ml-2 text-sm font-medium">Compartir</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Days Tabs -->
+        <div class="max-w-4xl mx-auto px-2 md:px-4">
+            <div class="flex overflow-x-auto hide-scrollbar border-b border-indigo-400" id="daysTabsContainer">
+                <!-- Tabs will be injected here -->
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-6 pb-24">
+        <div class="max-w-4xl mx-auto space-y-6">
+            
+            <!-- Loading State -->
+            <div id="loadingIndicator" class="flex justify-center items-center py-12">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-500"></i>
+                <span class="ml-3 text-indigo-600 font-medium">Cargando tu rutina...</span>
+            </div>
+
+            <div id="mainContent" class="hidden space-y-6">
+                <!-- Sleep Schedule Card (Special Block) -->
+                <div class="bg-gradient-to-r from-slate-800 to-indigo-900 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-20">
+                        <i class="fa-solid fa-moon text-6xl"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 class="text-lg font-bold flex items-center gap-2 text-indigo-200">
+                                    <i class="fa-solid fa-bed"></i> Descanso Nocturno
+                                </h2>
+                                <p class="text-sm text-slate-300 mt-1">Configura tus horas de sueño para este día.</p>
+                            </div>
+                            <button id="btnEditSleep" class="text-indigo-200 hover:text-white transition-colors p-2">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        </div>
+                        <div class="mt-4 flex items-center gap-4 bg-white/10 p-3 rounded-xl inline-flex backdrop-blur-sm">
+                            <div class="flex flex-col">
+                                <span class="text-xs text-indigo-300 uppercase font-semibold">Dormir</span>
+                                <span id="sleepStartDisplay" class="text-xl font-bold">22:00</span>
+                            </div>
+                            <div class="text-indigo-400">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-indigo-300 uppercase font-semibold">Despertar</span>
+                                <span id="sleepEndDisplay" class="text-xl font-bold">06:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-bold text-slate-800">Progreso del Día</h2>
+                        <span id="progressText" class="text-sm font-bold text-indigo-600">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                        <div id="progressBar" class="bg-indigo-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Daily Activities List -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-indigo-500"></i> Actividades del Día
+                        </h2>
+                        <button id="btnAddActivity" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Nueva</span>
+                        </button>
+                    </div>
+
+                    <!-- Timeline view -->
+                    <div id="activitiesList" class="relative border-l-2 border-indigo-100 ml-3 pl-5 space-y-4">
+                        <!-- Activities will be injected here -->
+                    </div>
+                    
+                    <div id="emptyActivities" class="hidden text-center py-8 text-slate-400">
+                        <i class="fa-regular fa-calendar-xmark text-4xl mb-3 text-slate-300"></i>
+                        <p>No hay actividades programadas.</p>
+                        <p class="text-sm">Toca "Nueva" para comenzar a planificar tu día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Container -->
+    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex justify-center items-center px-4 opacity-0 transition-opacity duration-300">
+        
+        <!-- Sleep Modal -->
+        <div id="sleepModal" class="bg-white rounded-2xl shadow-xl w-full max-w-md hidden transform scale-95 transition-transform duration-300 overflow-hidden">
+            <div class="bg-indigo-900 px-5 py-4 text-white flex justify-between items-center">
+                <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-moon"></i> Configurar Descanso</h3>
+                <button class="close-modal hover:text-indigo-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Hora de dormir</label>
+                        <input type="time" id="sleepStartInput" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Hora de despertar</label>
+                        <input type="time" id="sleepEndInput" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5">
+                    </div>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button class="close-modal flex-1 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg font-medium transition-colors">Cancelar</button>
+                    <button id="btnSaveSleep" class="flex-1 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-medium transition-colors">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Modal -->
+        <div id="activityModal" class="bg-white rounded-2xl shadow-xl w-full max-w-md hidden transform scale-95 transition-transform duration-300 overflow-hidden">
+            <div class="bg-indigo-600 px-5 py-4 text-white flex justify-between items-center">
+                <h3 id="activityModalTitle" class="font-bold flex items-center gap-2"><i class="fa-solid fa-clock"></i> Actividad</h3>
+                <button class="close-modal hover:text-indigo-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <input type="hidden" id="activityIdInput">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">¿Qué harás?</label>
+                    <input type="text" id="activityNameInput" placeholder="Ej. Desayunar, Lavar trastes..." class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Duración estimada</label>
+                    <select id="activityDurationInput" class="w-full bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5">
+                        <option value="15">15 minutos</option>
+                        <option value="30">30 minutos</option>
+                        <option value="60">1 hora</option>
+                        <option value="120">2 horas</option>
+                        <option value="180">3 horas</option>
+                        <option value="240">4 horas</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button class="close-modal flex-1 px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg font-medium transition-colors">Cancelar</button>
+                    <button id="btnSaveActivity" class="flex-1 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-medium transition-colors">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="alertModal" class="bg-white rounded-2xl shadow-xl w-full max-w-sm hidden transform scale-95 transition-transform duration-300 overflow-hidden text-center">
+            <div class="p-6">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
+                </div>
+                <h3 id="alertTitle" class="text-lg leading-6 font-medium text-slate-900 mb-2">Aviso</h3>
+                <p id="alertMessage" class="text-sm text-slate-500 mb-4">Mensaje de alerta.</p>
+                <button class="close-modal w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:text-sm">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment variables setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mi-rutina-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Default local structure if Firebase is unavailable
+        const daysOfWeek = [
+            { id: 'monday', name: 'Lunes', short: 'Lun' },
+            { id: 'tuesday', name: 'Martes', short: 'Mar' },
+            { id: 'wednesday', name: 'Miércoles', short: 'Mié' },
+            { id: 'thursday', name: 'Jueves', short: 'Jue' },
+            { id: 'friday', name: 'Viernes', short: 'Vie' },
+            { id: 'saturday', name: 'Sábado', short: 'Sáb' },
+            { id: 'sunday', name: 'Domingo', short: 'Dom' }
+        ];
+
+        let state = {
+            currentDay: 'monday',
+            userId: null,
+            db: null,
+            unsubscribe: null,
+            // Main data structure
+            routines: {} 
+        };
+
+        // Initialize routines with default sleep schedule
+        daysOfWeek.forEach(day => {
+            state.routines[day.id] = {
+                sleepStart: '22:00',
+                sleepEnd: '06:00',
+                activities: []
+            };
+        });
+
+        // Current real-time day selection
+        const todayIdx = (new Date().getDay() + 6) % 7; // Convert 0(Sun)-6(Sat) to 0(Mon)-6(Sun)
+        state.currentDay = daysOfWeek[todayIdx].id;
+
+        // Initialization
+        async function init() {
+            renderTabs();
+            
+            if (firebaseConfig) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    state.db = getFirestore(app);
+                    const auth = getAuth(app);
+
+                    if (initialToken) {
+                        await signInWithCustomToken(auth, initialToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    
+                    state.userId = auth.currentUser.uid;
+                    setupRealtimeListener();
+                } catch (error) {
+                    console.error("Firebase init failed:", error);
+                    showMainContent(); // Fallback to local memory
+                }
+            } else {
+                showMainContent(); // Running outside standard env
+            }
+            
+            setupEventListeners();
+        }
+
+        function setupRealtimeListener() {
+            if (!state.userId || !state.db) return;
+
+            const docRef = doc(state.db, 'artifacts', appId, 'users', state.userId, 'routinesData', 'weekData');
+            
+            state.unsubscribe = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Merge remote data with local structure
+                    Object.keys(data).forEach(day => {
+                        if (state.routines[day]) {
+                            state.routines[day] = data[day];
+                        }
+                    });
+                }
+                showMainContent();
+                renderRoutine();
+            }, (error) => {
+                console.error("Error listening to data:", error);
+                showAlert("Error", "Hubo un problema al sincronizar tus rutinas.");
+                showMainContent();
+            });
+        }
+
+        async function syncDataToCloud() {
+            if (!state.userId || !state.db) return;
+            const docRef = doc(state.db, 'artifacts', appId, 'users', state.userId, 'routinesData', 'weekData');
+            try {
+                await setDoc(docRef, state.routines);
+            } catch (error) {
+                console.error("Error saving data:", error);
+                showAlert("Error de guardado", "No se pudieron guardar los cambios en la nube.");
+            }
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('daysTabsContainer');
+            container.innerHTML = daysOfWeek.map(day => `
+                <button 
+                    class="day-tab flex-shrink-0 px-4 py-3 border-b-4 text-sm font-medium transition-colors ${state.currentDay === day.id ? 'border-white text-white bg-white/10' : 'border-transparent text-indigo-200 hover:text-white hover:bg-white/5'}"
+                    data-day="${day.id}"
+                >
+                    <span class="md:hidden">${day.short}</span>
+                    <span class="hidden md:inline">${day.name}</span>
+                </button>
+            `).join('');
+
+            document.querySelectorAll('.day-tab').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    state.currentDay = e.currentTarget.dataset.day;
+                    renderTabs(); // Re-render to update active state
+                    renderRoutine(); // Update content
+                });
+            });
+        }
+
+        // Helper function to convert HH:MM to minutes
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return 0;
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // Helper function to convert minutes to HH:MM
+        function minutesToTime(mins) {
+            const h = Math.floor(mins / 60) % 24;
+            const m = mins % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        }
+
+        function renderRoutine() {
+            const dayData = state.routines[state.currentDay];
+            
+            // Render Sleep Schedule
+            document.getElementById('sleepStartDisplay').textContent = dayData.sleepStart;
+            document.getElementById('sleepEndDisplay').textContent = dayData.sleepEnd;
+
+            // Calculate start and end times dynamically based on wake-up time
+            let currentStartTime = timeToMinutes(dayData.sleepEnd || '06:00');
+            
+            // Calculate dynamic times in sequential order
+            dayData.activities.forEach(act => {
+                const duration = parseInt(act.durationMinutes || 30); // Default 30 mins backwards compat
+                act.calculatedStart = minutesToTime(currentStartTime);
+                currentStartTime += duration;
+                act.calculatedEnd = minutesToTime(currentStartTime);
+            });
+
+            // Calculate Progress
+            const totalActs = dayData.activities.length;
+            const completedActs = dayData.activities.filter(a => a.completed).length;
+            const progressPercent = totalActs === 0 ? 0 : Math.round((completedActs / totalActs) * 100);
+            
+            document.getElementById('progressText').textContent = `${progressPercent}%`;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            // Render Activities
+            const container = document.getElementById('activitiesList');
+            const emptyState = document.getElementById('emptyActivities');
+            
+            if (totalActs === 0) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                container.classList.remove('hidden');
+                
+                container.innerHTML = dayData.activities.map((act) => `
+                    <div class="relative group">
+                        <!-- Timeline dot -->
+                        <div class="absolute -left-[27px] mt-1.5 h-3 w-3 rounded-full ${act.completed ? 'bg-green-500' : 'bg-indigo-500'} border-[3px] border-white shadow-sm transition-colors"></div>
+                        
+                        <div class="bg-slate-50 border ${act.completed ? 'border-green-200 bg-green-50/50' : 'border-slate-100'} rounded-xl p-3 flex justify-between items-center transition-all group-hover:shadow-md">
+                            <div class="flex items-center gap-3">
+                                <button class="btn-toggle-act text-2xl ${act.completed ? 'text-green-500' : 'text-slate-300 hover:text-indigo-400'} transition-colors" data-id="${act.id}">
+                                    <i class="fa-${act.completed ? 'solid fa-circle-check' : 'regular fa-circle'}"></i>
+                                </button>
+                                <div class="${act.completed ? 'opacity-60' : ''}">
+                                    <div class="text-sm font-bold ${act.completed ? 'text-green-600' : 'text-indigo-600'} flex items-center gap-2">
+                                        ${act.calculatedStart} - ${act.calculatedEnd} 
+                                        <span class="text-xs font-normal text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded">
+                                            ${act.durationMinutes >= 60 ? (act.durationMinutes/60) + 'h' : act.durationMinutes + 'm'}
+                                        </span>
+                                    </div>
+                                    <div class="text-slate-800 font-medium mt-0.5 ${act.completed ? 'line-through' : ''}">${act.name}</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="btn-edit-act p-2 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors" data-id="${act.id}">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button class="btn-delete-act p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" data-id="${act.id}">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Attach events to dynamic buttons
+                document.querySelectorAll('.btn-toggle-act').forEach(btn => {
+                    btn.addEventListener('click', () => toggleActivity(btn.dataset.id));
+                });
+                document.querySelectorAll('.btn-edit-act').forEach(btn => {
+                    btn.addEventListener('click', () => openActivityModal(btn.dataset.id));
+                });
+                document.querySelectorAll('.btn-delete-act').forEach(btn => {
+                    btn.addEventListener('click', () => deleteActivity(btn.dataset.id));
+                });
+            }
+        }
+
+        function toggleActivity(id) {
+            const dayActs = state.routines[state.currentDay].activities;
+            const act = dayActs.find(a => a.id === id);
+            if (act) {
+                act.completed = !act.completed;
+                syncDataToCloud();
+                renderRoutine();
+            }
+        }
+
+        function showMainContent() {
+            document.getElementById('loadingIndicator').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            renderRoutine();
+        }
+
+        function setupEventListeners() {
+            // Sleep editing
+            document.getElementById('btnEditSleep').addEventListener('click', () => {
+                const data = state.routines[state.currentDay];
+                document.getElementById('sleepStartInput').value = data.sleepStart;
+                document.getElementById('sleepEndInput').value = data.sleepEnd;
+                openModal('sleepModal');
+            });
+
+            document.getElementById('btnSaveSleep').addEventListener('click', () => {
+                const start = document.getElementById('sleepStartInput').value;
+                const end = document.getElementById('sleepEndInput').value;
+                if (!start || !end) {
+                    showAlert("Faltan datos", "Por favor ingresa ambas horas de sueño.");
+                    return;
+                }
+                state.routines[state.currentDay].sleepStart = start;
+                state.routines[state.currentDay].sleepEnd = end;
+                syncDataToCloud();
+                closeModals();
+                renderRoutine();
+            });
+
+            // Activity editing
+            document.getElementById('btnAddActivity').addEventListener('click', () => {
+                openActivityModal();
+            });
+
+            document.getElementById('btnSaveActivity').addEventListener('click', () => {
+                const id = document.getElementById('activityIdInput').value;
+                const name = document.getElementById('activityNameInput').value.trim();
+                const duration = parseInt(document.getElementById('activityDurationInput').value);
+
+                if (!name || isNaN(duration)) {
+                    showAlert("Faltan datos", "Por favor ingresa un nombre para la actividad.");
+                    return;
+                }
+
+                const newActivity = {
+                    id: id || crypto.randomUUID(),
+                    name,
+                    durationMinutes: duration,
+                    completed: false
+                };
+
+                const dayActs = state.routines[state.currentDay].activities;
+                
+                if (id) {
+                    const idx = dayActs.findIndex(a => a.id === id);
+                    if (idx !== -1) {
+                        // Conservar el estatus de completado al editar
+                        newActivity.completed = dayActs[idx].completed || false;
+                        dayActs[idx] = newActivity;
+                    }
+                } else {
+                    dayActs.push(newActivity);
+                }
+
+                syncDataToCloud();
+                closeModals();
+                renderRoutine();
+            });
+
+            // Close Modals
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', closeModals);
+            });
+
+            // Exports
+            document.getElementById('btnExport').addEventListener('click', exportToCSV);
+            document.getElementById('btnShareWA').addEventListener('click', shareViaWhatsApp);
+        }
+
+        function openActivityModal(id = null) {
+            const title = document.getElementById('activityModalTitle');
+            const idInput = document.getElementById('activityIdInput');
+            const nameInput = document.getElementById('activityNameInput');
+            const durationInput = document.getElementById('activityDurationInput');
+
+            if (id) {
+                const act = state.routines[state.currentDay].activities.find(a => a.id === id);
+                if (act) {
+                    title.innerHTML = '<i class="fa-solid fa-pen"></i> Editar Actividad';
+                    idInput.value = act.id;
+                    nameInput.value = act.name;
+                    durationInput.value = act.durationMinutes || 30;
+                }
+            } else {
+                title.innerHTML = '<i class="fa-solid fa-plus"></i> Nueva Actividad';
+                idInput.value = '';
+                nameInput.value = '';
+                durationInput.value = '30'; // 30 min por defecto
+            }
+            openModal('activityModal');
+        }
+
+        function deleteActivity(id) {
+            const dayActs = state.routines[state.currentDay].activities;
+            const updated = dayActs.filter(a => a.id !== id);
+            state.routines[state.currentDay].activities = updated;
+            syncDataToCloud();
+            renderRoutine();
+        }
+
+        // Modal Management
+        function openModal(modalId) {
+            const overlay = document.getElementById('modalOverlay');
+            const modal = document.getElementById(modalId);
+            
+            overlay.classList.remove('hidden');
+            modal.classList.remove('hidden');
+            
+            // Trigger reflow for animation
+            void overlay.offsetWidth;
+            
+            overlay.classList.remove('opacity-0');
+            modal.classList.remove('scale-95');
+            modal.classList.add('scale-100');
+        }
+
+        function closeModals() {
+            const overlay = document.getElementById('modalOverlay');
+            
+            overlay.classList.add('opacity-0');
+            document.querySelectorAll('#modalOverlay > div').forEach(modal => {
+                modal.classList.remove('scale-100');
+                modal.classList.add('scale-95');
+            });
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                document.querySelectorAll('#modalOverlay > div').forEach(modal => {
+                    modal.classList.add('hidden');
+                });
+            }, 300);
+        }
+
+        function showAlert(title, message) {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').textContent = message;
+            openModal('alertModal');
+        }
+
+        function exportToCSV() {
+            // Create CSV content
+            let csvContent = "Día,Tipo,Inicio,Fin,Actividad,Completada\n";
+
+            daysOfWeek.forEach(day => {
+                const dayData = state.routines[day.id];
+                // Add Sleep
+                csvContent += `"${day.name}","Sueño","${dayData.sleepStart}","${dayData.sleepEnd}","Descanso Nocturno",""\n`;
+                
+                // Add activities dynamically calculating time
+                let currentStartTime = timeToMinutes(dayData.sleepEnd || '06:00');
+                
+                dayData.activities.forEach(act => {
+                    const duration = parseInt(act.durationMinutes || 30);
+                    const actStart = minutesToTime(currentStartTime);
+                    currentStartTime += duration;
+                    const actEnd = minutesToTime(currentStartTime);
+                    const completadaTxt = act.completed ? "Sí" : "No";
+                    
+                    csvContent += `"${day.name}","Rutina","${actStart}","${actEnd}","${act.name.replace(/"/g, '""')}","${completadaTxt}"\n`;
+                });
+            });
+
+            // Create Blob and download
+            const blob = new Blob(["\ufeff", csvContent], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel encoding
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'Mi_Rutina_Semanal.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function shareViaWhatsApp() {
+            const currentDayName = daysOfWeek.find(d => d.id === state.currentDay).name;
+            const dayData = state.routines[state.currentDay];
+            
+            let text = `*Mi Rutina - ${currentDayName}* 🗓️\n\n`;
+            
+            // Sleep
+            text += `🌙 *Descanso Nocturno*\n`;
+            text += `Duermo a las: ${dayData.sleepStart}\n`;
+            text += `Despierto a las: ${dayData.sleepEnd}\n\n`;
+
+            // Activities
+            if (dayData.activities.length > 0) {
+                text += `✅ *Actividades del día:*\n`;
+                
+                let currentStartTime = timeToMinutes(dayData.sleepEnd || '06:00');
+                
+                dayData.activities.forEach(act => {
+                    const duration = parseInt(act.durationMinutes || 30);
+                    const actStart = minutesToTime(currentStartTime);
+                    currentStartTime += duration;
+                    const actEnd = minutesToTime(currentStartTime);
+                    
+                    const check = act.completed ? "✅" : "⏳";
+                    text += `${check} ${actStart} - ${actEnd}: ${act.name}\n`;
+                });
+            } else {
+                text += `*Sin actividades programadas aún.*`;
+            }
+
+            const encodedText = encodeURIComponent(text);
+            const url = `https://wa.me/?text=${encodedText}`;
+            window.open(url, '_blank');
+        }
+
+        // Boot
+        init();
+    </script>
+</body>
+</html>
